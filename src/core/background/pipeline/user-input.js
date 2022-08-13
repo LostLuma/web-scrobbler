@@ -20,7 +20,10 @@ define((require) => {
 			// Do nothing
 		}
 
-		song.flags.isCorrectedByUser = isSongInfoLoaded;
+		// This may already be set from external-info
+		if (!song.flags.isCorrectedByUser) {
+			song.flags.isCorrectedByUser = isSongInfoLoaded;
+		}
 	}
 
 	return { process };

@@ -5,6 +5,7 @@
  */
 define((require) => {
 	const UserInput = require('pipeline/user-input');
+	const ExternalInfo = require('pipeline/external-info');
 	const Metadata = require('pipeline/metadata');
 	const Normalize = require('pipeline/normalize');
 	const CoverArtArchive = require('pipeline/coverartarchive');
@@ -13,7 +14,7 @@ define((require) => {
 		constructor() {
 			this.song = null;
 			this.processors = [
-				Normalize, UserInput, Metadata, CoverArtArchive,
+				Normalize, ExternalInfo, UserInput, Metadata, CoverArtArchive,
 			];
 		}
 
