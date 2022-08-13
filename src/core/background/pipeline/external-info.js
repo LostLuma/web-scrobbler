@@ -18,7 +18,7 @@ define((require) => {
 
         const hashArray = Array.from(new Uint8Array(digest));
         return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-      }
+    }
 
 	/**
 	 * Add song info provided by the API.
@@ -39,7 +39,9 @@ define((require) => {
             const data = await resp.text();
 
             prefixLength = Number(data);
-        } catch {}
+        } catch {
+            return;
+        }
 
         const sha1 = await sha1HexDigest(uniqueId);
         const prefix = sha1.slice(0, prefixLength);
@@ -51,7 +53,9 @@ define((require) => {
             const data = await resp.text();
 
             songInfoAvailable = data.includes(sha1);
-        } catch(e) {}
+        } catch(e) {
+            return;
+        }
 
         if (!songInfoAvailable) {
             return;
@@ -62,7 +66,9 @@ define((require) => {
         try {
             const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/youtube-video/${uniqueId}`);
             songInfo = await resp.json();
-        } catch {}
+        } catch {
+            return;
+        }
 
         Util.debugLog(`Loaded song info from scrobble API: ${JSON.stringify(songInfo)}`);
 
