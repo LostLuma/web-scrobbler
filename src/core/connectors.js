@@ -290,6 +290,13 @@ const connectors = [{
 	js: 'connectors/odnoklassniki.js',
 	id: 'odnoklassniki',
 }, {
+	label: 'Online Radio Box',
+	matches: [
+		'*://onlineradiobox.com/*',
+	],
+	js: 'connectors/onlineradiobox.js',
+	id: 'onlineradiobox',
+}, {
 	label: '163 Music',
 	matches: [
 		'*://music.163.com/*',
@@ -2010,6 +2017,13 @@ const connectors = [{
 	],
 	js: 'connectors/livephish.js',
 	id: 'livephish.com',
+}, {
+	label: 'Ishkur\'s Guide to Electronic Music',
+	matches: [
+		'*://music.ishkur.com/*',
+	],
+	js: 'connectors/ishkur.js',
+	id: 'music.ishkur.com',
 }, {
 	label: 'KCRW 89.9FM',
 	matches: [
