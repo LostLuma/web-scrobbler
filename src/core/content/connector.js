@@ -527,9 +527,13 @@ function BaseConnector() {
 		 */
 		const isPlaying = this.isPlaying();
 		if (isPlaying !== currentState.isPlaying) {
-			this.stateChangedWorker();
+			setTimeout(() => {
+				this.stateChangedWorker();
+			}, 100);
 		} else {
-			this.stateChangedWorkerThrottled();
+			setTimeout(() => {
+				this.stateChangedWorkerThrottled();
+			}, 100);
 		}
 	};
 
