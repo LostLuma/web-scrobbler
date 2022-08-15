@@ -20,63 +20,84 @@ define((require) => {
         return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     }
 
+    let prefixLength;
+
+    function resetPrefixLength() {
+        prefixLength = null;
+    }
+
+    async function getHashPrefix(sha1) {
+        if (!prefixLength) {
+            const resp = await fetch("https://scrobble-api.lostluma.dev/v1/prefix-length");
+            const data = await resp.text();
+
+            prefixLength = Number(data);
+        }
+
+        return sha1.slice(0, prefixLength);
+    }
+
+    async function videoIsKnown(uniqueId) {
+        const sha1 = await sha1HexDigest(uniqueId);
+
+        // This might need to be re-tried if the cached prefix length is wrong
+        while (true) {
+            const prefix = await getHashPrefix(sha1);
+
+            const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/range/${prefix}`);
+            const data = await resp.text();
+
+            if (resp.ok) {
+                return data.includes(sha1);
+            }
+
+            if (resp.status === 400 && data.includes("Incorrect prefix length requested.")) {
+                resetPrefixLength();
+            } else {
+                throw new Error("Received currently unhandled HTTP response from scrobble API.");
+            }
+        }
+    }
+
+    async function getVideoInfo(uniqueId) {
+        const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/youtube-video/${uniqueId}`);
+        return await resp.json();
+    }
+
 	/**
 	 * Add song info provided by the API.
 	 * @param  {Object} song Song instance
 	 */
 	async function process(song) {
-        const uniqueId = song.getUniqueId();
-        const isYoutube = song.connectorLabel.toLowerCase().includes("youtube");
-
-        if (!uniqueId || !isYoutube) {
-            return;
-        }
-
-        let prefixLength; // TODO: Cache this value later
-
         try {
-            const resp = await fetch("https://scrobble-api.lostluma.dev/v1/prefix-length");
-            const data = await resp.text();
+            const uniqueId = song.getUniqueId();
+            const isYoutube = song.connectorLabel.toLowerCase().includes("youtube");
 
-            prefixLength = Number(data);
-        } catch {
-            return;
-        }
+            if (!uniqueId || !isYoutube) {
+                return;
+            }
 
-        const sha1 = await sha1HexDigest(uniqueId);
-        const prefix = sha1.slice(0, prefixLength);
+            const songInfoAvailable = await videoIsKnown(uniqueId);
 
-        let songInfoAvailable;
+            if (!songInfoAvailable) {
+                return;
+            }
 
-        try {
-            const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/range/${prefix}`);
-            const data = await resp.text();
+            const songInfo = await getVideoInfo(uniqueId);
+            Util.debugLog(`Loaded song info from scrobble API: ${JSON.stringify(songInfo)}`);
 
-            songInfoAvailable = data.includes(sha1);
+            for (const field in songInfo) {
+                const data = songInfo[field];
+
+                if (data) {
+                    song.processed[field] = data;
+                }
+            }
+
+            song.flags.isCorrectedByUser = true;
         } catch(e) {
-            return;
+            Util.debugLog(`Failed to apply external info: ${e}.`);
         }
-
-        if (!songInfoAvailable) {
-            return;
-        }
-
-        let songInfo;
-
-        try {
-            const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/youtube-video/${uniqueId}`);
-            songInfo = await resp.json();
-        } catch {
-            return;
-        }
-
-        Util.debugLog(`Loaded song info from scrobble API: ${JSON.stringify(songInfo)}`);
-
-        for (const field in songInfo) {
-            song.processed[field] = songInfo[field];
-        }
-
-		song.flags.isCorrectedByUser = true;
 	}
 
 	return { process };
