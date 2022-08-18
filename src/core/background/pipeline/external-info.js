@@ -20,21 +20,21 @@ define((require) => {
         return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     }
 
-    let prefixLength;
+    let _prefixLength;
 
     function resetPrefixLength() {
-        prefixLength = null;
+        _prefixLength = null;
     }
 
     async function getHashPrefix(sha1) {
-        if (!prefixLength) {
+        if (!_prefixLength) {
             const resp = await fetch("https://scrobble-api.lostluma.dev/v1/prefix-length");
             const data = await resp.text();
 
-            prefixLength = Number(data);
+            _prefixLength = Number(data);
         }
 
-        return sha1.slice(0, prefixLength);
+        return sha1.slice(0, _prefixLength);
     }
 
     async function videoIsKnown(uniqueId) {
