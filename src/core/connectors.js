@@ -1130,10 +1130,9 @@ const connectors = [{
 	js: 'connectors/blocsonic.js',
 	id: 'blocsonic',
 }, {
-	label: 'Resonate.is',
+	label: 'Resonate',
 	matches: [
-		'*://resonate.is/*',
-		'*://*.resonate.is/*',
+		'*://stream.resonate.coop/*',
 	],
 	js: 'connectors/resonate.js',
 	id: 'resonate',
@@ -2024,6 +2023,13 @@ const connectors = [{
 	],
 	js: 'connectors/ishkur.js',
 	id: 'music.ishkur.com',
+}, {
+	label: 'Nonoki',
+	matches: [
+		'https://nonoki.com/music/*',
+	],
+	js: 'connectors/nonoki.js',
+	id: 'nonoki',
 }, {
 	label: 'KCRW 89.9FM',
 	matches: [
