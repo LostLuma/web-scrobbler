@@ -7,6 +7,7 @@
 define((require) => {
 	const MD5 = require('md5');
 	const Song = require('object/song');
+	const Util = require("../util/util");
 
 	class SavedEditsModel {
 		/**
@@ -41,6 +42,15 @@ define((require) => {
 			return false;
 		}
 
+		async saveExternalVideoInfo(uniqueId, song) {
+			const resp = await fetch(`https://scrobble-api.lostluma.dev/v1/youtube-video/${uniqueId}`, { method: "POST", body: JSON.stringify(song) });
+
+			if (!resp.ok) {
+				const data = await resp.text();
+				Util.debugLog(`Failed to save song info to scrobble API: ${resp.status} ${data}`);
+			}
+		}
+
 		/**
 		 * Save custom song info to the storage.
 		 *
@@ -48,18 +58,27 @@ define((require) => {
 		 * @param {Object} dataToSave User data
 		 */
 		async saveSongInfo(song, dataToSave) {
-			const songId = SavedEditsModel.getSongId(song);
-			const storageData = await this.getSongInfoStorage();
+			const uniqueId = song.getUniqueId();
+            const isYoutube = song.connectorLabel.toLowerCase().includes("youtube");
 
-			if (!storageData[songId]) {
-				storageData[songId] = {};
+			if (uniqueId && isYoutube) {
+				try {
+					await this.saveExternalVideoInfo(uniqueId, dataToSave);
+				} catch {}
+			} else {
+				const songId = SavedEditsModel.getSongId(song);
+				const storageData = await this.getSongInfoStorage();
+
+				if (!storageData[songId]) {
+					storageData[songId] = {};
+				}
+
+				for (const field in dataToSave) {
+					storageData[songId][field] = dataToSave[field];
+				}
+
+				await this.saveSongInfoToStorage(storageData);
 			}
-
-			for (const field in dataToSave) {
-				storageData[songId][field] = dataToSave[field];
-			}
-
-			await this.saveSongInfoToStorage(storageData);
 		}
 
 		/**
