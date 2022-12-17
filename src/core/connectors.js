@@ -691,7 +691,7 @@ const connectors = [{
 	js: 'connectors/emby.js',
 	id: 'emby',
 }, {
-	label: 'Freegal',
+	label: 'Freegal Music',
 	matches: [
 		'*://*.freegalmusic.com/*',
 	],
@@ -1005,6 +1005,13 @@ const connectors = [{
 	],
 	js: 'connectors/streamsquid.js',
 	id: 'streamsquid',
+}, {
+	label: 'Streemlion',
+	matches: [
+		'*://listen.streemlion.com/*',
+	],
+	js: 'connectors/streemlion.js',
+	id: 'streemlion',
 }, {
 	label: 'eMusic',
 	matches: [
@@ -1343,7 +1350,7 @@ const connectors = [{
 	js: 'connectors/funkwhale.js',
 	id: 'funkwhale',
 }, {
-	label: '9128 live',
+	label: '9128.live',
 	matches: [
 		'*://9128.live/*',
 	],
@@ -1357,6 +1364,14 @@ const connectors = [{
 	],
 	js: 'connectors/radioco.js',
 	id: 'radioco',
+}, {
+	label: 'Super45.fm',
+	matches: [
+		'*://super45.fm/',
+	],
+	js: 'connectors/radioco.js',
+	id: 'super45fm',
+	allFrames: true,
 }, {
 	label: 'R/a/dio',
 	matches: [
@@ -1989,16 +2004,44 @@ const connectors = [{
 }, {
 	label: 'Radio Horizonte',
 	matches: [
-		'*://*horizonte.cl/*',
+		'*://horizonte.cl/*',
 	],
-	js: 'connectors/horizonte.cl.js',
+	js: 'connectors/mediastream.js',
 	id: 'horizontecl',
+}, {
+	label: 'Sonar FM',
+	matches: [
+		'*://sonarfm.cl/*',
+	],
+	js: 'connectors/mediastream.js',
+	id: 'sonarfmcl',
+}, {
+	label: 'Play FM',
+	matches: [
+		'*://playfm.cl/*',
+	],
+	js: 'connectors/mediastream.js',
+	id: 'playfmcl',
+}, {
+	label: 'WKM Radio',
+	matches: [
+		'*://www.wkmradio.com/*',
+	],
+	js: 'connectors/mediastream.js',
+	id: 'wkmradio',
+}, {
+	label: 'Rockaxis',
+	matches: [
+		'*://www.rockaxis.com/*',
+	],
+	js: 'connectors/mediastream.js',
+	id: 'rockaxis',
 }, {
 	label: 'Rock&Pop Chile',
 	matches: [
-		'*://envivo.rockandpop.cl/*',
+		'*://www.rockandpop.cl/*',
 	],
-	js: 'connectors/rockandpop.cl.js',
+	js: 'connectors/rockandpopcl.js',
 	id: 'rockandpopcl',
 }, {
 	label: 'WYEP',
@@ -2190,11 +2233,17 @@ const connectors = [{
 }, {
 	label: 'XRAY.FM',
 	matches: [
-		'*://xray.fm/*',
-		'*://www.xray.fm/*',
+		'*://*.xray.fm/*',
 	],
 	js: 'connectors/xrayfm.js',
 	id: 'xrayfm',
+}, {
+	label: 'DKFM Shoegaze Radio',
+	matches: [
+		'*://decayfm.com/*',
+	],
+	js: 'connectors/decayfm.js',
+	id: 'decayfm',
 }, {
 	label: 'QCIndie',
 	matches: [
@@ -2209,6 +2258,65 @@ const connectors = [{
 	],
 	js: 'connectors/cpr.js',
 	id: 'cpr',
+}, {
+	label: 'Indie 102.3',
+	matches: [
+		'*://indie.cpr.org/',
+	],
+	js: 'connectors/cpr-indie.js',
+	id: 'cpr-indie',
+}, {
+	label: 'WXPN',
+	matches: [
+		'*://xpn.org/*',
+	],
+	js: 'connectors/xpn.js',
+	id: 'xpn',
+}, {
+	label: 'FRISKY',
+	matches: [
+		'*://*.frisky.fm/*',
+	],
+	js: 'connectors/friskyfm.js',
+	id: 'friskyfm',
+}, {
+	label: 'GotRadio',
+	matches: [
+		'*://player.gotradio.com/*',
+	],
+	js: 'connectors/gotradio.js',
+	id: 'gotradio',
+}, {
+	label: 'LightningStream',
+	matches: [
+		'*://*.lightningstream.com/Player*',
+		'*://*.lightningstream.com/player*',
+	],
+	js: 'connectors/lightningstream.js',
+	id: 'lightningstream',
+}, {
+	label: 'Securenet Systems',
+	matches: [
+		'*://radio.securenetsystems.net/*',
+		'*://stream*.securenetsystems.net/*',
+	],
+	js: 'connectors/securenetsystems.js',
+	id: 'securenetsystems',
+}, {
+	label: 'WBRU',
+	matches: [
+		'*://www.wbru.com/*',
+	],
+	js: 'connectors/radioco.js',
+	id: 'wbru',
+	allFrames: true,
+}, {
+	label: 'uwu radio',
+	matches: [
+		'*://radio.uwu.network/*',
+	],
+	js: 'connectors/uwu-radio.js',
+	id: 'uwu-radio',
 }];
 
 define(() => connectors);
