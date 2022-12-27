@@ -485,6 +485,13 @@ const connectors = [{
 	js: 'connectors/rmfon.js',
 	id: 'rmfon',
 }, {
+	label: 'Radio 357',
+	matches: [
+		'*://radio357.pl/*',
+	],
+	js: 'connectors/radio357.js',
+	id: 'radio357',
+}, {
 	label: 'JazzRadio',
 	matches: [
 		'*://www.jazzradio.com/*',
@@ -1331,6 +1338,13 @@ const connectors = [{
 	],
 	js: 'connectors/invidious.js',
 	id: 'invidious',
+}, {
+	label: 'Piped',
+	matches: [
+		'*://piped.video/*',
+	],
+	js: 'connectors/piped.js',
+	id: 'piped',
 }, {
 	label: 'Pretzel',
 	matches: [
@@ -2317,6 +2331,21 @@ const connectors = [{
 	],
 	js: 'connectors/uwu-radio.js',
 	id: 'uwu-radio',
+}, {
+	label: 'MyStreamPlayer',
+	matches: [
+		'*://*.mystreamplayer.com/*',
+	],
+	js: 'connectors/mystreamplayer.js',
+	id: 'mystreamplayer',
+}, {
+	label: 'BagelRadio',
+	matches: [
+		'*://*.bagelradio.com/*',
+	],
+	js: 'connectors/mystreamplayer.js',
+	id: 'bagelradio',
+	allFrames: true,
 }];
 
 define(() => connectors);
