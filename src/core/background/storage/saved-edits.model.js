@@ -43,7 +43,7 @@ define((require) => {
 		}
 
 		async saveExternalVideoInfo(uniqueId, song) {
-			const resp = await fetch(`https://music-metadata.lostluma.dev/v1/youtube-video/${uniqueId}`, { method: "POST", body: JSON.stringify(song) });
+			const resp = await fetch(`https://music-metadata.lostluma.net/v1/youtube-video/${uniqueId}`, { method: "POST", body: JSON.stringify(song) });
 
 			if (!resp.ok) {
 				const data = await resp.text();

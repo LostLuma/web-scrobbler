@@ -28,7 +28,7 @@ define((require) => {
 
     async function getHashPrefix(sha1) {
         if (!_prefixLength) {
-            const resp = await fetch("https://music-metadata.lostluma.dev/v1/prefix-length");
+            const resp = await fetch("https://music-metadata.lostluma.net/v1/prefix-length");
             const data = await resp.text();
 
             _prefixLength = Number(data);
@@ -44,7 +44,7 @@ define((require) => {
         while (true) {
             const prefix = await getHashPrefix(sha1);
 
-            const resp = await fetch(`https://music-metadata.lostluma.dev/v1/range/${prefix}`);
+            const resp = await fetch(`https://music-metadata.lostluma.net/v1/range/${prefix}`);
             const data = await resp.text();
 
             if (resp.ok) {
@@ -60,7 +60,7 @@ define((require) => {
     }
 
     async function getVideoInfo(uniqueId) {
-        const resp = await fetch(`https://music-metadata.lostluma.dev/v1/youtube-video/${uniqueId}`);
+        const resp = await fetch(`https://music-metadata.lostluma.net/v1/youtube-video/${uniqueId}`);
         return await resp.json();
     }
 
