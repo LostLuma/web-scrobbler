@@ -3,6 +3,7 @@
  */
 import * as UserInput from '@/core/object/pipeline/user-input';
 import * as Copy from '@/core/object/pipeline/copy';
+import * as ExternalInfo from '@/core/object/pipeline/external-info';
 import * as Metadata from '@/core/object/pipeline/metadata';
 import * as Normalize from '@/core/object/pipeline/normalize';
 import * as RegexEdits from '@/core/object/pipeline/regex-edits';
@@ -16,6 +17,7 @@ export default class Pipeline {
 		Copy,
 		Normalize,
 		UserInput,
+		ExternalInfo,
 		RegexEdits,
 		Metadata,
 		RegexEdits, // Run regex edits again, as the regex edit might have caused an album to be found.

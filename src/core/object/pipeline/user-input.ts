@@ -19,5 +19,8 @@ export async function process(song: Song): Promise<void> {
 		debugLog(err, 'error');
 	}
 
-	song.flags.isCorrectedByUser = isSongInfoLoaded;
+	// This may already be set from external-info
+	if (!song.flags.isCorrectedByUser) {
+		song.flags.isCorrectedByUser = isSongInfoLoaded;
+	}
 }
