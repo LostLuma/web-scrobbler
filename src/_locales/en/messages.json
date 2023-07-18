@@ -3,7 +3,6 @@
         "message": "Scrobble music all around the web!",
         "description": "Description of the extension"
     },
-
     "optionsTitle": {
         "message": "Web Scrobbler options",
         "description": "Title of options page"
@@ -11,6 +10,10 @@
     "optionsGeneral": {
         "message": "General",
         "description": "'General' section"
+    },
+    "optionsPermissionsLabel": {
+        "message": "You have not granted Web Scrobbler the permission to access all sites, which means you have to click the extension icon to start scrobbling every time. Click here to grant the permission. Note that in safari the permission will not automatically be granted, but the next time you visit a supported site you will be able to click \"Always Allow on Every Website...\" to grant the permission.",
+        "description": "Label for permissions button"
     },
     "optionUseNotifications": {
         "message": "Use now playing notifications",
@@ -49,7 +52,7 @@
         "description": "Option title"
     },
     "optionScrobbleRecognizedTracks": {
-        "message": "Scrobble recognized or edited tracks",
+        "message": "Scrobble recognized or edited tracks (default)",
         "description": "Option label"
     },
     "optionScrobbleRecognizedTracksTitle": {
@@ -100,7 +103,42 @@
         "message": "Ignore videos that are not in Entertainment category",
         "description": "Option title"
     },
-
+    "optionYtGetTrackInfoFromYtMusic": {
+        "message": "Use Youtube Music to get track info",
+        "description": "Option label"
+    },
+    "optionYtGetTrackInfoFromYtMusicTitle": {
+        "message": "Use Youtube Music to get track info, if disabled defaults to using description and video title",
+        "description": "Option title"
+    },
+    "optionYtMusicRecognisedOnly": {
+        "message": "Scrobble only videos that are recognized by YouTube Music as music",
+        "description": "Option label"
+    },
+    "optionYtMusicRecognisedOnlyTitle": {
+        "message": "Ignore videos that are not recognised by YouTube Music as music",
+        "description": "Option title"
+    },
+    "optionTheme": {
+        "message": "Theme",
+        "description": "Option label"
+    },
+    "optionThemeTitle": {
+        "message": "Choose the theme of the extension",
+        "description": "Option title"
+    },
+    "optionThemeLight": {
+        "message": "Light",
+        "description": "Option label"
+    },
+    "optionThemeDark": {
+        "message": "Dark",
+        "description": "Option label"
+    },
+    "optionThemeSystem": {
+        "message": "System",
+        "description": "Option label"
+    },
     "optionsAccounts": {
         "message": "Accounts",
         "description": "'Accounts' section"
@@ -149,10 +187,13 @@
         "message": "Custom token",
         "description": "Input label"
     },
-
     "optionsOptions": {
         "message": "Options",
         "description": "'Options' section"
+    },
+    "optionsEdits": {
+        "message": "Edits",
+        "description": "'Edits' section"
     },
     "optionsEditedTracks": {
         "message": "Edited tracks",
@@ -166,6 +207,18 @@
         "message": "$1 edited tracks",
         "description": "'Edited tracks' header"
     },
+    "optionsRegexEdits": {
+        "message": "Regex/Bulk edits",
+        "description": "'Regex/Bulk edits' header"
+    },
+    "optionsRegexEditsDesc": {
+        "message": "This extension stores regex/bulk edits.",
+        "description": "Description of regex/bulk edits"
+    },
+    "optionsRegexEditsPopupTitle": {
+        "message": "$1 regex/bulk edits",
+        "description": "'Regex/Bulk edits' header"
+    },
     "optionsViewEdited": {
         "message": "View",
         "description": "Button to view edited tracks"
@@ -177,6 +230,10 @@
     "optionsImportEdited": {
         "message": "Import",
         "description": "Button to import edited tracks"
+    },
+    "optionsConnectors": {
+        "message": "Connectors",
+        "description": "'Connectors' section"
     },
     "optionsEnableDisableHint": {
         "message": "Click on the checkbox to enable/disable connectors.",
@@ -194,12 +251,14 @@
         "message": "Toggle",
         "description": "Label of toggle button"
     },
-
+    "optionsLoadingConnectorOptions": {
+        "message": "Loading connector options...",
+        "description": "Loading connector options message"
+    },
     "learnMoreLabel": {
         "message": "Learn more",
         "description": "Learn more label"
     },
-
     "contactTitle": {
         "message": "Contact",
         "description": "'Contact' section"
@@ -216,7 +275,6 @@
         "message": "View the privacy policy",
         "description": "Description for privacy section"
     },
-
     "faqTitle": {
         "message": "FAQ",
         "description": "'FAQ' section"
@@ -313,7 +371,6 @@
         "message": "The original author of this extension is David Šabata. Now this extension is developed and maintained by the Web Scrobbler Team.",
         "description": "Answer #7"
     },
-
     "optionsAbout": {
         "message": "About",
         "description": "'About' section"
@@ -334,9 +391,17 @@
         "message": "You can find the list of contributors <a href=\"https://github.com/web-scrobbler/web-scrobbler/graphs/contributors\">right on the GitHub</a>",
         "description": "'About' section text"
     },
+    "contributorsContribute": {
+        "message": "Want to contribute? See all the ways you can contribute to the project at <a href=\"https://web-scrobbler.com#contributing\" target=\"_blank\" rel=\"noopener noreferrer\">our website</a>.",
+        "description": "'About' section text"
+    },
     "showSomeLoveTitle": {
         "message": "Show some love",
         "description": "'Show some love' section"
+    },
+    "showSomeLoveFundingCampaign": {
+        "message": "Over time a significant backlog of issues has been built up in the Web Scrobbler repository. From mid-August 2023 until mid-March 2024 one of our main developers will be available to work full-time on the project at a reduced rate. Roughly speaking, for every $$1500 we raise, we can pay for one month of full-time work, up to around $$9-10k. If you want to support this campaign and help us run through our backlog and make Web Scrobbler even better than it has ever been, you can use the button below. We remain committed to keeping Web Scrobbler and all of its features completely free forever. Please help spread the word.",
+        "description": "Temporary funding campaign"
     },
     "showSomeLoveText1": {
         "message": "Unlike other extensions, this one does not contain any flashing banners or sneaky ads.",
@@ -347,8 +412,8 @@
         "description": ""
     },
     "donationButtonLabel": {
-      "message": "Support us on OpenCollective",
-      "description": "The donation button label"
+        "message": "Support us on OpenCollective",
+        "description": "The donation button label"
     },
     "customPatterns": {
         "message": "URL patterns",
@@ -386,8 +451,6 @@
         "message": "No items in cache.",
         "description": "Popup hint"
     },
-
-
     "getStartedHeader": {
         "message": "Play some music to get started",
         "description": "The header of 'Get started' popup"
@@ -404,8 +467,6 @@
         "message": "The connector code for this specific website needs to be updated. You can navigate to the <a href=\"https://github.com/web-scrobbler/web-scrobbler/issues\" target=\"_blank\">list of issues</a> and see if this website is already reported. If it is not, you can submit a new issue describing what's wrong, what's expected behavior and what's happening instead.",
         "description": "Description of how to submit new issue"
     },
-
-
     "serviceErrorHeader": {
         "message": "Service error",
         "description": "The header of 'error' popup"
@@ -414,7 +475,6 @@
         "message": "Looks like something went wrong while scrobbling the music. Please open the options page and try to reauthenticate with services. If reauthentication doesn't help, and you still see this message, please create <a href=\"https://github.com/web-scrobbler/web-scrobbler/issues\" target=\"_blank\">a new issue</a> at the GitHub project page.",
         "description": "The description of service error"
     },
-
     "disabledSiteHeader": {
         "message": "This website is turned off",
         "description": "The header of 'disabled' popup"
@@ -427,7 +487,6 @@
         "message": "Open options page",
         "description": "Button label"
     },
-
     "unsupportedWebsiteHeader": {
         "message": "This website is not supported",
         "description": "The header of 'unsupported' popup"
@@ -440,7 +499,10 @@
         "message": "Some Google websites supported by the extension (e.g. Google Play Music, YouTube) can be blocked due to an ExtensionSettings policy.",
         "description": "The description of 'unsupported' popup"
     },
-
+    "unsupportedWebsiteUpdateNote": {
+        "message": "If the extension recently updated sites may show as unsupported until you refresh the page.",
+        "description": "The description of 'unsupported' popup"
+    },
     "infoLove": {
         "message": "Love track",
         "description": "Label of love/unlove button"
@@ -457,6 +519,14 @@
         "message": "You cannot edit this track",
         "description": "Title of edit button"
     },
+    "infoEditTitleShort": {
+        "message": "Edit",
+        "description": "Title of edit button, should be short for mobile button label"
+    },
+    "infoEditUnableTitleShort": {
+        "message": "Can't Edit",
+        "description": "Title of edit button, should be short for mobile button label"
+    },
     "infoSwapTitle": {
         "message": "Swap title and artist",
         "description": "Title of swap button"
@@ -464,6 +534,26 @@
     "infoSwapUnableTitle": {
         "message": "You cannot swap empty track info",
         "description": "Title of swap button"
+    },
+    "infoSwapTitleShort": {
+        "message": "Swap title/artist",
+        "description": "Title of swap button, should be short for mobile button label"
+    },
+    "infoSwapUnableTitleShort": {
+        "message": "Can't swap info",
+        "description": "Title of swap button, should be short for mobile button label"
+    },
+    "infoRegexTitle": {
+        "message": "Regex/Bulk edit mode",
+        "description": "Title of regex/bulk edit button"
+    },
+    "infoRegexTitleShort": {
+        "message": "Regex/Bulk edit",
+        "description": "Title of regex/bulk edit button, should be short for mobile button label"
+    },
+    "infoEditedWarning": {
+        "message": "This track has been edited. Regex edits are not applied to edited tracks, and the preview you see here may be inaccurate.",
+        "description": "Warning message to user if bulk editing on a previously edited track"
     },
     "infoSubmitTitle": {
         "message": "Submit changes",
@@ -473,6 +563,14 @@
         "message": "You cannot submit empty track info",
         "description": "Title of submit button"
     },
+    "infoSubmitTitleShort": {
+        "message": "Submit",
+        "description": "Title of submit button, should be short for mobile button label"
+    },
+    "infoSubmitUnableTitleShort": {
+        "message": "Can't submit",
+        "description": "Title of submit button, should be short for mobile button label"
+    },
     "infoRevertTitle": {
         "message": "Revert changes",
         "description": "Title of revert button"
@@ -480,6 +578,14 @@
     "infoRevertUnableTitle": {
         "message": "You cannot revert this track",
         "description": "Title of revert button"
+    },
+    "infoRevertTitleShort": {
+      "message": "Revert",
+      "description": "Title of revert button, should be short for mobile button label"
+    },
+    "infoRevertUnableTitleShort": {
+      "message": "Can't Revert",
+      "description": "Title of revert button, should be short for mobile button label"
     },
     "infoSkipTitle": {
         "message": "Don't scrobble current track",
@@ -492,6 +598,18 @@
     "infoSkippedTitle": {
         "message": "You skipped this track",
         "description": "Title of unskip button"
+    },
+    "infoSkipTitleShort": {
+      "message": "Skip",
+      "description": "Title of skip button, should be short for mobile button label"
+    },
+    "infoSkipUnableTitleShort": {
+      "message": "Can't Skip",
+      "description": "Title of skip button, should be short for mobile button label"
+    },
+    "infoSkippedTitleShort": {
+      "message": "Skipped",
+      "description": "Title of unskip button, should be short for mobile button label"
     },
     "infoOpenAlbumArt": {
         "message": "Open album art in new tab",
@@ -513,6 +631,34 @@
         "message": "Album artist (optional)",
         "description": "Placeholder of album artist input"
     },
+    "infoSearchLabel": {
+        "message": "Search",
+        "description": "Label of regex edit search input"
+    },
+    "infoReplaceLabel": {
+        "message": "Replace",
+        "description": "Label of regex edit replace input"
+    },
+    "infoPreviewLabel": {
+        "message": "Preview",
+        "description": "Label of regex edit preview output"
+    },
+    "infoArtistLabel": {
+      "message": "Artist",
+      "description": "Label of artist input row"
+    },
+    "infoTrackLabel": {
+        "message": "Track",
+        "description": "Label of track input row"
+    },
+    "infoAlbumLabel": {
+        "message": "Album",
+        "description": "Label of album input row"
+    },
+    "infoAlbumArtistLabel": {
+        "message": "Album artist",
+        "description": "Label of album artist input row"
+    },
     "infoViewArtistPage": {
         "message": "View artist page: $1",
         "description": "Placeholder of album input"
@@ -529,8 +675,6 @@
         "message": "Your scrobbles: $1",
         "description": "Label for user play count"
     },
-
-
     "pageActionBase": {
         "message": "This site is supported for scrobbling",
         "description": "`base` page action title"
@@ -539,9 +683,9 @@
         "message": "Looking up $1",
         "description": "`loading` page action title"
     },
-    "pageActionRecognized": {
+    "pageActionPlaying": {
         "message": "Now playing $1",
-        "description": "`recognized` page action title"
+        "description": "`playing` page action title"
     },
     "pageActionScrobbled": {
         "message": "Scrobbled $1",
@@ -579,8 +723,6 @@
         "message": "You unloved $1",
         "description": "`unsupported` page action title"
     },
-
-
     "menuDisableConnector": {
         "message": "Disable $1 connector",
         "description": "Context menu item"
@@ -593,8 +735,6 @@
         "message": "Disable $1 connector until tab is closed",
         "description": "Context menu item"
     },
-
-
     "notificationConnectAccounts": {
         "message": "Connect your accounts",
         "description": "Notification title"
@@ -619,7 +759,6 @@
         "message": "Click on the icon in the extensions bar to correct and submit track info.",
         "description": "Notification text"
     },
-
     "hotkeyToggleConnector": {
         "message": "Toggle scrobbling for current website",
         "description": "Hotkey label"
