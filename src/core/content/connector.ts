@@ -644,21 +644,24 @@ export default class BaseConnector {
 				return;
 			}
 
-			/**
-			 * Because gathering the state from DOM is quite expensive and mutation
-			 * events can be emitted REALLY often, we use throttle to set a minimum
-			 * delay between two calls of the state change listener.
-			 *
-			 * Only exception is change in pause/play state which we detect
-			 * immediately so we don't miss a quick play/pause/play or
-			 * pause/play/pause sequence.
-			 */
-			const isPlaying = this.isPlaying();
-			if (isPlaying !== this.currentState.isPlaying) {
-				this.stateChangedWorker();
-			} else {
-				this.stateChangedWorkerThrottled();
-			}
+			setTimeout(() => {
+				/**
+				 * Because gathering the state from DOM is quite expensive and mutation
+				 * events can be emitted REALLY often, we use throttle to set a minimum
+				 * delay between two calls of the state change listener.
+				 *
+				 * Only exception is change in pause/play state which we detect
+				 * immediately so we don't miss a quick play/pause/play or
+				 * pause/play/pause sequence.
+				 */
+				const isPlaying = this.isPlaying();
+
+				if (isPlaying !== this.currentState.isPlaying) {
+					this.stateChangedWorker();
+				} else {
+					this.stateChangedWorkerThrottled();
+				}
+			}, 100);
 		};
 
 		this.stateChangedWorker = () => {
