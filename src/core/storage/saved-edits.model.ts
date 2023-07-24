@@ -7,7 +7,6 @@ import { CustomStorage } from '@/core/storage/custom-storage';
 import { DataModels } from '@/core/storage/wrapper';
 import { LOCAL_CACHE } from '@/core/storage/browser-storage';
 import { SavedEdit } from '@/core/storage/options';
-import { debugLog } from '../content/util';
 
 type K = typeof LOCAL_CACHE;
 type V = DataModels[K];
@@ -51,20 +50,6 @@ export default abstract class SavedEditsModel extends CustomStorage<K> {
 		return false;
 	}
 
-	async saveExternalVideoInfo(uniqueId: string, song: SavedEdit) {
-		const resp = await fetch(
-			`https://music-metadata.lostluma.net/v1/youtube-video/${uniqueId}`,
-			{ method: 'POST', body: JSON.stringify(song) }
-		);
-
-		if (!resp.ok) {
-			const data = await resp.text();
-			debugLog(
-				`Failed to save song info to scrobble API: ${resp.status} ${data}`
-			);
-		}
-	}
-
 	/**
 	 * Save custom song info to the storage.
 	 *
@@ -72,17 +57,6 @@ export default abstract class SavedEditsModel extends CustomStorage<K> {
 	 * @param dataToSave - User data
 	 */
 	async saveSongInfo(song: BaseSong, dataToSave: SavedEdit): Promise<void> {
-		const uniqueId = song.getUniqueId();
-		const isYoutube = song.connectorLabel.toLowerCase().includes('youtube');
-
-		if (uniqueId && isYoutube) {
-			try {
-				await this.saveExternalVideoInfo(uniqueId, dataToSave);
-			} catch {}
-
-			return;
-		}
-
 		const songId = SavedEditsModel.getSongId(song);
 		const storageData = await this.getSongInfoStorage();
 		if (storageData === null) {

@@ -13,6 +13,7 @@ import * as ControllerMode from '@/core/object/controller/controller-mode';
 import * as ControllerEvents from '@/core/object/controller/controller-event';
 import { ServiceCallResult } from '@/core/object/service-call-result';
 import SavedEdits from '@/core/storage/saved-edits';
+import SharedSavedEdits from '@/core/storage/shared-saved-edits';
 import { State } from '@/core/types';
 import {
 	contentListener,
@@ -348,7 +349,10 @@ export default class Controller {
 			throw new Error('Unable to set user data for scrobbled song');
 		}
 
-		await SavedEdits.saveSongInfo(this.currentSong, data);
+		// Save edit remotely if supported, else us browser storage.
+		if (!(await SharedSavedEdits.put(this.currentSong, data))) {
+			await SavedEdits.saveSongInfo(this.currentSong, data);
+		}
 
 		this.unprocessSong();
 		void this.processSong();

@@ -28,6 +28,7 @@ import {
 	getMobileNavigatorGroup,
 } from '../options/components/navigator';
 import ContextMenu from '../components/context-menu/context-menu';
+import sharedSavedEdits from '@/core/storage/shared-saved-edits';
 
 /**
  * Component that allows the user to edit the currently playing track
@@ -330,7 +331,11 @@ async function saveEdit(
 		albumArtist: string | null;
 	}
 ) {
-	await savedEdits.saveSongInfo(clonedSong, data);
+	// Save edit remotely if supported, else us browser storage.
+	if (!(await sharedSavedEdits.put(clonedSong, data))) {
+		await savedEdits.saveSongInfo(clonedSong, data);
+	}
+
 	sendBackgroundMessage(tab()?.tabId ?? -1, {
 		type: 'reprocessSong',
 		payload: undefined,
