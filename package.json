@@ -39,15 +39,15 @@
     "@types/fs-extra": "11.0.1",
     "@types/imagemin": "8.0.1",
     "@types/imagemin-jpegtran": "5.0.1",
-    "@types/node": "20.5.6",
+    "@types/node": "20.6.0",
     "@types/react": "18.2.21",
     "@types/webextension-polyfill": "0.10.2",
     "@typescript-eslint/eslint-plugin": "6.6.0",
-    "archiver": "6.0.0",
+    "archiver": "6.0.1",
     "canvas": "2.11.2",
     "chokidar": "3.5.3",
     "esbuild": "0.19.2",
-    "eslint": "8.48.0",
+    "eslint": "8.49.0",
     "eslint-config-web-scrobbler": "2.1.1",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-solid": "0.13.0",
@@ -65,12 +65,12 @@
     "sass": "1.66.1",
     "solid-js": "1.7.11",
     "stylelint-config-web-scrobbler": "0.2.0",
-    "tsx": "3.12.7",
+    "tsx": "3.12.8",
     "typescript": "5.2.2",
     "vite-plugin-conditional-compiler": "0.1.1",
     "vite-plugin-solid": "2.7.0",
     "vite-plugin-static-copy": "0.17.0",
-    "vitest": "0.34.3"
+    "vitest": "0.34.4"
   },
   "engines": {
     "node": ">=18.0.0"
