@@ -29,7 +29,7 @@ export default function GlobalOptionsList(props: {
 	return (
 		<>
 			<h2>{t('optionsGeneral')}</h2>
-			<ul>
+			<ul class={styles.optionList}>
 				<ThemeSelector />
 				<Show when={browser.notifications}>
 					<GlobalOptionEntry
@@ -53,17 +53,17 @@ export default function GlobalOptionsList(props: {
 					options={props.options}
 					setOptions={props.setOptions}
 					globalOptions={globalOptions}
-					i18ntitle="optionScrobblePodcastsTitle"
-					i18nlabel="optionScrobblePodcasts"
-					key={Options.SCROBBLE_PODCASTS}
+					i18ntitle="optionUseInfoboxTitle"
+					i18nlabel="optionUseInfobox"
+					key={Options.USE_INFOBOX}
 				/>
 				<GlobalOptionEntry
 					options={props.options}
 					setOptions={props.setOptions}
 					globalOptions={globalOptions}
-					i18ntitle="optionDebugLoggingEnabledTitle"
-					i18nlabel="optionDebugLoggingEnabled"
-					key={Options.DEBUG_LOGGING_ENABLED}
+					i18ntitle="optionScrobblePodcastsTitle"
+					i18nlabel="optionScrobblePodcasts"
+					key={Options.SCROBBLE_PODCASTS}
 				/>
 			</ul>
 		</>
@@ -91,9 +91,9 @@ function ThemeSelector() {
 								`value ${
 									e.currentTarget.value
 								} not in themelist ${modifiedThemeList.join(
-									','
+									',',
 								)}`,
-								'error'
+								'error',
 							);
 							return;
 						}
@@ -106,8 +106,8 @@ function ThemeSelector() {
 							<option value={`theme-${themeName}`}>
 								{t(
 									`optionTheme${capitalizeFirstLetter(
-										themeName
-									)}`
+										themeName,
+									)}`,
 								)}
 							</option>
 						)}

@@ -50,7 +50,7 @@ export function EditsModal() {
 					Object.keys(edits() ?? {}).length.toString(),
 				)}
 			</h1>
-			<ul>
+			<ul class={styles.optionList}>
 				<For each={Object.entries(edits() ?? {})}>
 					{([key, value]) => (
 						<TrackInfo key={key} track={value} mutate={mutate} />
@@ -78,12 +78,15 @@ function TrackInfo(props: {
 	return (
 		<li class={styles.deleteListing}>
 			<button
-				class={styles.deleteEditButton}
+				class={`${styles.button} ${styles.small} ${styles.marginRight}`}
 				onClick={(event) => {
 					event.stopPropagation();
+					const key = props.key;
 					props.mutate((e) => {
-						if (!e) return e;
-						delete e[props.key];
+						if (!e) {
+							return e;
+						}
+						delete e[key];
 						localCache.set(e);
 						return {
 							...e,

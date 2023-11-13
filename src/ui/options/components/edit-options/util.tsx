@@ -32,7 +32,7 @@ export function ViewEdits(props: {
 }) {
 	return (
 		<button
-			class={styles.editButton}
+			class={`${styles.button} ${styles.shiftLeft}`}
 			onClick={(e) => {
 				e.stopImmediatePropagation();
 				props.setActiveModal(props.type);
@@ -54,8 +54,10 @@ export function ExportEdits(props: {
 }) {
 	return (
 		<button
-			class={styles.editButton}
-			onClick={() => downloadEdits(props.editWrapper, props.filename)}
+			class={`${styles.button} ${styles.shiftLeft}`}
+			onClick={() =>
+				void downloadEdits(props.editWrapper, props.filename)
+			}
 		>
 			<Upload />
 			{t('optionsExportEdited')}
@@ -68,7 +70,9 @@ export function ExportEdits(props: {
  */
 async function downloadEdits(editWrapper: EditWrapper, filename: string) {
 	const edits = await editWrapper.get();
-	if (!edits) return;
+	if (!edits) {
+		return;
+	}
 	const data = `data:text/json;charset=UTF-8,${encodeURIComponent(
 		JSON.stringify(edits),
 	)}`;
@@ -87,7 +91,10 @@ export function ImportEdits(props: {
 }) {
 	const [ref, setRef] = createSignal<HTMLInputElement>();
 	return (
-		<button class={styles.editButton} onClick={() => ref()?.click()}>
+		<button
+			class={`${styles.button} ${styles.shiftLeft}`}
+			onClick={() => ref()?.click()}
+		>
 			<Download />
 			{t('optionsImportEdited')}
 			<input
@@ -113,20 +120,28 @@ function pushEdits(
 	mutate: EditSetter,
 ) {
 	const file = e.currentTarget.files?.[0];
-	if (!file) return;
+	if (!file) {
+		return;
+	}
 	const reader = new FileReader();
-	reader.addEventListener('load', async (e) => {
-		const edits = JSON.parse(e.target?.result as string);
-		const oldEdits = await editWrapper.get();
-		const newEdits =
-			oldEdits instanceof Array
-				? [...(oldEdits ?? []), ...edits]
-				: {
-						...oldEdits,
-						...edits,
-				  };
-		editWrapper.set(newEdits);
-		mutate(newEdits);
-	});
+	reader.addEventListener(
+		'load',
+		(arg) =>
+			void (async (e) => {
+				const edits = JSON.parse(
+					e.target?.result as string,
+				) as RegexEdit[];
+				const oldEdits = await editWrapper.get();
+				const newEdits =
+					oldEdits instanceof Array
+						? [...(oldEdits ?? []), ...edits]
+						: {
+								...oldEdits,
+								...edits,
+						  };
+				editWrapper.set(newEdits);
+				mutate(newEdits);
+			})(arg),
+	);
 	reader.readAsText(file);
 }

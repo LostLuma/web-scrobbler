@@ -3,7 +3,9 @@ export {};
 Connector.playerSelector = '.playbar';
 
 Connector.getArtistTrack = () => {
-	const artistTrack = Util.getTextFromSelectors('.playbar__info__artist');
+	const artistTrack = Util.getTextFromSelectors(
+		'span rs-player-marquee div p',
+	);
 	return Util.splitArtistTrack(artistTrack, null, true);
 };
 
@@ -11,7 +13,7 @@ Connector.isPlaying = () => {
 	return (
 		Util.getAttrFromSelectors(
 			'.playbar rs-play-button > rs-button > button',
-			'title'
+			'title',
 		) === 'Pausieren'
 	);
 };

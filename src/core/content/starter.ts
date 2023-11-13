@@ -3,12 +3,12 @@
  * on pageload, this starter is needed for connectors to start running
  */
 
-import Reactor from '@/core/content/reactor';
 import BaseConnector from './connector';
 import * as BrowserStorage from '@/core/storage/browser-storage';
 import { DISABLED_CONNECTORS } from '@/core/storage/options';
 import { sendContentMessage } from '@/util/communication';
 import * as Util from '@/core/content/util';
+import Controller from '../object/controller/controller';
 
 /**
  * Sets up observers and "starts up" the connector
@@ -22,7 +22,7 @@ export default function start(): void {
 	if (isConnectorInvalid()) {
 		Util.debugLog(
 			'You have overwritten or unset the Connector object',
-			'warn'
+			'warn',
 		);
 		return;
 	}
@@ -49,24 +49,24 @@ async function setupStateListening(): Promise<void> {
 	const globalOptions = BrowserStorage.getStorage(BrowserStorage.OPTIONS);
 	const options = await globalOptions.get();
 	const disabledTabs = BrowserStorage.getStorage(
-		BrowserStorage.DISABLED_TABS
+		BrowserStorage.DISABLED_TABS,
 	);
 	const disabledTabList = await disabledTabs.get();
 	const currentTab = await sendContentMessage({
 		type: 'getTabId',
 		payload: undefined,
 	});
-	new Reactor(
-		Connector,
+
+	createController(
 		!disabledTabList?.[currentTab ?? -2]?.[Connector.meta.id] &&
 			(options === null ||
-				!options[DISABLED_CONNECTORS][Connector.meta.id])
+				!options[DISABLED_CONNECTORS][Connector.meta.id]),
 	);
 
 	if (Connector.playerSelector === null) {
 		Util.debugLog(
 			'`Connector.playerSelector` is empty. The current connector is expected to manually detect state changes',
-			'info'
+			'info',
 		);
 		return;
 	}
@@ -79,10 +79,20 @@ async function setupStateListening(): Promise<void> {
 	} else {
 		Util.debugLog(
 			`Element '${Connector.playerSelector.toString()}' is missing`,
-			'warn'
+			'warn',
 		);
 		setupSecondObserver();
 	}
+}
+
+/**
+ * Creates controller
+ *
+ * @param isEnabled - Whether the connector is enabled or not
+ */
+function createController(isEnabled: boolean) {
+	const controller = new Controller(Connector, isEnabled);
+	Connector.controllerCallback = controller.onStateChanged.bind(controller);
 }
 
 /**
@@ -105,7 +115,7 @@ function setupObserver(observeTarget: Node) {
 		`Used '${
 			Connector.playerSelector?.toString() ??
 			'errorPlayerSelectorNotDefined'
-		}' to watch changes.`
+		}' to watch changes.`,
 	);
 }
 

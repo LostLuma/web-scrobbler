@@ -4,6 +4,11 @@
 export const Base = 'Base';
 
 /**
+ * An option, or something hard coded into the connector, is disallowing scrobbling.
+ */
+export const Disallowed = 'Disallowed';
+
+/**
  * A connector attached to a controller is disabled by a user.
  */
 export const Disabled = 'Disabled';

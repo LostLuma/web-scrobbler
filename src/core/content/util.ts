@@ -8,7 +8,12 @@ import type {
 	TrackInfoWithAlbum,
 } from '@/core/types';
 import type { ConnectorOptions } from '@/core/storage/options';
+import type { ControllerModeStr } from '@/core/object/controller/controller';
 import type { DebugLogType } from '@/util/util';
+
+import { t } from '@/util/i18n';
+import * as ControllerMode from '@/core/object/controller/controller-mode';
+import Song from '../object/song';
 
 const BrowserStorage = (async () => {
 	return import('@/core/storage/browser-storage');
@@ -29,6 +34,7 @@ export type Separator =
 	| ' \u002d '
 	| ' \u2013 '
 	| ' \u2014 '
+	| ' \u2022 '
 	| ' // '
 	| '\u002d'
 	| '\u2013'
@@ -42,8 +48,8 @@ export type Separator =
 	| '<br/>'
 	| ' by '
 	| ', '
-	| '-'
-	| '·';
+	| '·'
+	| ' ·';
 
 /**
  * Separator used to join array of artist names into a single string.
@@ -668,6 +674,7 @@ export function queryElements(
 	}
 
 	for (const selector of selectors) {
+		// eslint-disable-next-line
 		const elements = document.querySelectorAll(
 			selector,
 		) as NodeListOf<HTMLElement>;
@@ -750,46 +757,52 @@ export function injectScriptIntoDocument(scriptUrl: string): void {
  * that logs are still printed in a predictable order.
  */
 class DebugLogQueue {
-  private queue: {text: unknown, logType: DebugLogType}[] = [];
-  private isActive = false;
-  private shouldPrint = Options.then((awaitedOptions) => awaitedOptions.getOption(awaitedOptions.DEBUG_LOGGING_ENABLED));
+	private queue: { text: unknown; logType: DebugLogType }[] = [];
+	private isActive = false;
+	private shouldPrint = Options.then((awaitedOptions) =>
+		awaitedOptions.getOption(awaitedOptions.DEBUG_LOGGING_ENABLED),
+	);
 
-  /**
-   * Enqueue a log message to be printed.
-   * @param text - Debug message
-   * @param logType - Log type
-   */
-  public push(text: unknown, logType: DebugLogType): void {
-    this.queue.push({text, logType});
-    this.start();
-  }
+	/**
+	 * Enqueue a log message to be printed.
+	 * @param text - Debug message
+	 * @param logType - Log type
+	 */
+	public push(text: unknown, logType: DebugLogType): void {
+		this.queue.push({ text, logType });
+		this.start();
+	}
 
-  /**
-   * Process the queue to print logs in order.
-   */
-  private async start(): Promise<void> {
-    if (this.isActive) return;
-    this.isActive = true;
+	/**
+	 * Process the queue to print logs in order.
+	 */
+	private async start(): Promise<void> {
+		if (this.isActive) {
+			return;
+		}
+		this.isActive = true;
 
-    try {
-      for (let i = 0; i < 100 && this.queue.length > 0; i++) {
-        const currentMessage = this.queue.shift();
-        if (currentMessage && await this.shouldPrint) {
-          const logFunc = console[currentMessage.logType];
+		try {
+			for (let i = 0; i < 100 && this.queue.length > 0; i++) {
+				const currentMessage = this.queue.shift();
+				if (currentMessage && (await this.shouldPrint)) {
+					const logFunc = console[currentMessage.logType];
 
-          if (typeof logFunc !== 'function') {
-            throw new TypeError(`Unknown log type: ${currentMessage.logType}`);
-          }
+					if (typeof logFunc !== 'function') {
+						throw new TypeError(
+							`Unknown log type: ${currentMessage.logType}`,
+						);
+					}
 
-          const message = `Web Scrobbler: ${currentMessage.text}`;
-          logFunc(message);
-        }
-      }
-      this.isActive = false;
-    } catch(err) {
-      this.isActive = false;
-    }
-  }
+					const message = `Web Scrobbler: ${currentMessage.text?.toString()}`;
+					logFunc(message);
+				}
+			}
+			this.isActive = false;
+		} catch (err) {
+			this.isActive = false;
+		}
+	}
 }
 const debugLogQueue = new DebugLogQueue();
 
@@ -800,7 +813,7 @@ const debugLogQueue = new DebugLogQueue();
  */
 /* istanbul ignore next */
 export function debugLog(text: unknown, logType: DebugLogType = 'log'): void {
-  debugLogQueue.push(text, logType)
+	debugLogQueue.push(text, logType);
 }
 
 /** YouTube section. */
@@ -861,13 +874,16 @@ export function processYtVideoTitle(
 	title = title.replace(/-\s*([「【『])/, '$1');
 
 	// 【/(*Music Video/MV/PV*】/)
-	title = title.replace(/[(【].*?((MV)|(PV)).*?[】)]/i, '');
+	title = title.replace(
+		/[(［【][^(［【]*?((Music Video)|(MV)|(PV)).*?[】］)]/i,
+		'',
+	);
 
 	// 【/(東方/オリジナル*】/)
-	title = title.replace(/[(【]((オリジナル)|(東方)).*?[】)]/, '');
+	title = title.replace(/[(［【]((オリジナル)|(東方)).*?[】］)]+?/, '');
 
 	// MV/PV if followed by an opening/closing bracket
-	title = title.replace(/(MV|PV)([「【『』】」])/i, '$2');
+	title = title.replace(/((?:Music Video)|MV|PV)([「［【『』】］」])/i, '$2');
 
 	// MV/PV if ending and with whitespace in front
 	title = title.replace(/\s+(MV|PV)$/i, '');
@@ -1028,4 +1044,26 @@ export function getOriginUrl(selector: string): string {
 		originUrlAnchor.getAttribute('href')?.split('?')?.[0] ??
 		document.location.href
 	);
+}
+
+export function getInfoBoxText(
+	mode: ControllerModeStr | undefined,
+	song: Song | null,
+) {
+	if (!mode) {
+		return t('pageActionLoading');
+	}
+
+	const trackInfo = `${song?.getArtist()} - ${song?.getTrack()}`;
+	switch (mode) {
+		case ControllerMode.Disallowed:
+			return t('infoBoxStateDisallowed', trackInfo);
+		case ControllerMode.Err:
+			return t('infoBoxStateError');
+		case ControllerMode.Unknown:
+			return t('infoBoxStateUnknown');
+		default:
+			// re-use existing translation messages
+			return t(`pageAction${mode}`, trackInfo);
+	}
 }

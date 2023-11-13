@@ -36,6 +36,7 @@ import {
 import ClonedSong from '@/core/object/cloned-song';
 import { openTab } from '@/util/util-browser';
 import { setRegexDefaults } from '@/util/regex';
+import { attemptInjectAllTabs } from './inject';
 import {
 	getSongInfo,
 	scrobble,
@@ -45,17 +46,26 @@ import {
 	toggleLove,
 } from './scrobble';
 import scrobbleService from '../object/scrobble-service';
+import { fetchListenBrainzProfile } from '@/util/util';
 
 const disabledTabs = BrowserStorage.getStorage(BrowserStorage.DISABLED_TABS);
 
 // Set up listeners. These must all be synchronously set up at startup time (Manifest V3 service worker)
-browser.runtime.onStartup.addListener(startupFunc);
-browser.runtime.onInstalled.addListener(startupFunc);
-browser.tabs.onRemoved.addListener(onTabRemoved);
-browser.tabs.onUpdated.addListener(onTabUpdated);
-browser.tabs.onActivated.addListener(onTabActivated);
-browser.contextMenus?.onClicked.addListener(contextMenuHandler);
-browser.commands?.onCommand.addListener(commandHandler);
+browser.runtime.onStartup.addListener(onStartup);
+browser.runtime.onInstalled.addListener(onInstalled);
+browser.tabs.onRemoved.addListener((tabId) => void onTabRemoved(tabId));
+browser.tabs.onUpdated.addListener(
+	(tabId, changeInfo, tab) => void onTabUpdated(tabId, changeInfo, tab),
+);
+browser.tabs.onActivated.addListener(
+	(activeInfo) => void onTabActivated(activeInfo),
+);
+browser.contextMenus?.onClicked.addListener(
+	(info) => void contextMenuHandler(info),
+);
+browser.commands?.onCommand.addListener(
+	(command) => void commandHandler(command),
+);
 
 /**
  * Handle user commands (hotkeys) to the extension.
@@ -93,7 +103,7 @@ function setLoveStatus(tabId: number, isLoved: boolean) {
 	sendBackgroundMessage(tabId ?? -1, {
 		type: 'toggleLove',
 		payload: {
-			isLoved: isLoved,
+			isLoved,
 		},
 	});
 }
@@ -213,7 +223,10 @@ async function updateTab(
 				activeTabs,
 				browserPreferredTheme: curState.browserPreferredTheme,
 			});
-			updateTabsFromTabList(activeTabs, tabId);
+
+			// this can be different from the tab of the script calling the mode change
+			const activeTabId = await getCurrentTabId();
+			updateTabsFromTabList(activeTabs, activeTabId);
 			return;
 		}
 		performedSet = true;
@@ -229,7 +242,10 @@ async function updateTab(
 			activeTabs: newTabs,
 			browserPreferredTheme: curState.browserPreferredTheme,
 		});
-		updateTabsFromTabList(activeTabs, tabId);
+
+		// this can be different from the tab of the script calling the mode change
+		const activeTabId = await getCurrentTabId();
+		updateTabsFromTabList(activeTabs, activeTabId);
 	} catch (err) {
 		if (!performedSet) {
 			unlockState();
@@ -339,6 +355,7 @@ setupBackgroundListeners(
 	 */
 	backgroundListener({
 		type: 'setPaused',
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		fn: (payload, sender) => {
 			return sendPaused(
 				new ClonedSong(payload.song, sender.tab?.id ?? -1),
@@ -351,6 +368,7 @@ setupBackgroundListeners(
 	 */
 	backgroundListener({
 		type: 'setResumedPlaying',
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		fn: (payload, sender) => {
 			return sendResumedPlaying(
 				new ClonedSong(payload.song, sender.tab?.id ?? -1),
@@ -394,6 +412,15 @@ setupBackgroundListeners(
 	}),
 
 	/**
+	 * Listener called by a content script to attempt signing into musicbrainz.
+	 * This has to be done in background script, as safari blocks sending necessary cookies in other scripts.
+	 */
+	backgroundListener({
+		type: 'sendListenBrainzRequest',
+		fn: async (payload) => fetchListenBrainzProfile(payload.url),
+	}),
+
+	/**
 	 * Listener called by a controller to trigger clearing now playing notification.
 	 */
 	backgroundListener({
@@ -424,6 +451,7 @@ setupBackgroundListeners(
 	 */
 	backgroundListener({
 		type: 'updateTheme',
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		fn: async (payload) => {
 			const curState = await getState();
 			await setState({
@@ -467,7 +495,7 @@ async function bindScrobblers() {
  * Sets up the starting state of the extension on browser startup/extension install.
  * Storage is used instead of variables, as with Manifest V3 service workers, script state cannot be guaranteed.
  */
-function startupFunc() {
+function onStartup() {
 	const state = BrowserStorage.getStorage(BrowserStorage.STATE_MANAGEMENT);
 	state.set(DEFAULT_STATE);
 	disabledTabs.set({});
@@ -501,6 +529,15 @@ function startupFunc() {
 		contexts: ['action'],
 		title: 'Error: You should not be seeing this',
 	});
+}
+
+/**
+ * To be ran on install/update. Does all the things extension does on startup,
+ * and also injects the content script into all eligible tabs as the old ones have been invalidated.
+ */
+function onInstalled() {
+	onStartup();
+	attemptInjectAllTabs();
 }
 
 /**

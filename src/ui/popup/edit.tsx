@@ -34,26 +34,24 @@ import sharedSavedEdits from '@/core/storage/shared-saved-edits';
  * Component that allows the user to edit the currently playing track
  */
 export default function Edit(props: { tab: Resource<ManagerTab> }) {
-	const { tab } = props;
-
-	const rawTab = tab();
-	if (!rawTab) return <></>;
-	const rawSong = rawTab.song;
-	if (!rawSong) return <></>;
-	const clonedSong = new ClonedSong(rawSong, rawTab.tabId);
-
-	const [track, setTrack] = createSignal(clonedSong.getTrack() ?? '');
-	const [artist, setArtist] = createSignal(clonedSong.getArtist() ?? '');
-	const [album, setAlbum] = createSignal(clonedSong.getAlbum() ?? '');
-	const [albumArtist, setAlbumArtist] = createSignal(
-		clonedSong.getAlbumArtist() ?? ''
-	);
-	const [isRegex, setIsRegex] = createSignal(false);
-
-	sendBackgroundMessage(tab()?.tabId ?? -1, {
-		type: 'setEditState',
-		payload: true,
+	const clonedSong = createMemo(() => {
+		const tab = props.tab();
+		if (!tab) {
+			return;
+		}
+		const rawSong = tab.song;
+		if (!rawSong) {
+			return;
+		}
+		return new ClonedSong(rawSong, tab.tabId);
 	});
+
+	const [track, setTrack] = createSignal('');
+	const [artist, setArtist] = createSignal('');
+	const [album, setAlbum] = createSignal('');
+	const [albumArtist, setAlbumArtist] = createSignal('');
+
+	const [isRegex, setIsRegex] = createSignal(false);
 
 	// manually set popup width property, safari does not play well with dynamic width
 	let nowplaying: HTMLDivElement | undefined;
@@ -66,6 +64,16 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 	const observer = new ResizeObserver(resizeWindow);
 
 	onMount(() => {
+		setTrack(clonedSong()!.getTrack() ?? '');
+		setArtist(clonedSong()!.getArtist() ?? '');
+		setAlbum(clonedSong()!.getAlbum() ?? '');
+		setAlbumArtist(clonedSong()!.getAlbumArtist() ?? '');
+
+		sendBackgroundMessage(props.tab()?.tabId ?? -1, {
+			type: 'setEditState',
+			payload: true,
+		});
+
 		if (!nowplaying) {
 			return;
 		}
@@ -75,7 +83,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 		observer.observe(nowplaying);
 
 		const interval = setInterval(() => {
-			sendBackgroundMessage(tab()?.tabId ?? -1, {
+			sendBackgroundMessage(props.tab()?.tabId ?? -1, {
 				type: 'setEditState',
 				payload: true,
 			});
@@ -86,7 +94,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 	});
 
 	onCleanup(() => {
-		sendBackgroundMessage(tab()?.tabId ?? -1, {
+		sendBackgroundMessage(props.tab()?.tabId ?? -1, {
 			type: 'setEditState',
 			payload: false,
 		});
@@ -100,12 +108,12 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 			<Show when={isIos()}>
 				<Switch>
 					<Match when={isRegex()}>
-						<RegexEditContextMenu tab={tab} />
+						<RegexEditContextMenu tab={props.tab} />
 					</Match>
 					<Match when={!isRegex()}>
 						<EditContextMenu
-							tab={tab}
-							clonedSong={clonedSong}
+							tab={props.tab}
+							clonedSong={clonedSong()}
 							setIsRegex={setIsRegex}
 							track={track}
 							artist={artist}
@@ -118,28 +126,40 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 			<div class={styles.nowPlayingPopup} ref={nowplaying}>
 				<Switch>
 					<Match when={isRegex()}>
-						<Regex clonedSong={clonedSong} tab={tab} />
+						<Regex clonedSong={clonedSong()} tab={props.tab} />
 					</Match>
 					<Match when={!isRegex()}>
 						<PopupAnchor
 							class={styles.coverArtWrapper}
 							href={
-								clonedSong.getTrackArt() ??
+								clonedSong()?.getTrackArt() ??
 								browser.runtime.getURL(
 									'img/cover_art_default.png'
 								)
 							}
 							title={t('infoOpenAlbumArt')}
 						>
-							<img
-								class={styles.coverArt}
-								src={
-									clonedSong.getTrackArt() ??
-									browser.runtime.getURL(
-										'img/cover_art_default.png'
-									)
-								}
-							/>
+							<div
+								class={styles.coverArtBackground}
+								style={{
+									'background-image': `url(${
+										clonedSong()?.getTrackArt() ??
+										browser.runtime.getURL(
+											'img/cover_art_default.png'
+										)
+									})`,
+								}}
+							>
+								<img
+									class={styles.coverArt}
+									src={
+										clonedSong()?.getTrackArt() ??
+										browser.runtime.getURL(
+											'img/cover_art_default.png'
+										)
+									}
+								/>
+							</div>
 							<Squircle id="coverArtClip" />
 						</PopupAnchor>
 						<div
@@ -149,7 +169,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 									event.key === 'Enter' &&
 									!event.isComposing
 								) {
-									saveEdit(tab, clonedSong, {
+									saveEdit(props.tab, clonedSong(), {
 										artist: artist(),
 										track: track(),
 										album: album() || null,
@@ -161,7 +181,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 							<input
 								class={styles.editField}
 								type="text"
-								value={clonedSong.getTrack() ?? ''}
+								value={clonedSong()?.getTrack() ?? ''}
 								title={t('infoTrackPlaceholder')}
 								placeholder={t('infoTrackPlaceholder')}
 								onInput={(e) => {
@@ -171,7 +191,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 							<input
 								class={styles.editField}
 								type="text"
-								value={clonedSong.getArtist() ?? ''}
+								value={clonedSong()?.getArtist() ?? ''}
 								title={t('infoArtistPlaceholder')}
 								placeholder={t('infoArtistPlaceholder')}
 								onInput={(e) => {
@@ -181,7 +201,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 							<input
 								class={styles.editField}
 								type="text"
-								value={clonedSong.getAlbum() ?? ''}
+								value={clonedSong()?.getAlbum() ?? ''}
 								title={t('infoAlbumPlaceholder')}
 								placeholder={t('infoAlbumPlaceholder')}
 								onInput={(e) => {
@@ -191,7 +211,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 							<input
 								class={styles.editField}
 								type="text"
-								value={clonedSong.getAlbumArtist() ?? ''}
+								value={clonedSong()?.getAlbumArtist() ?? ''}
 								title={t('infoAlbumArtistPlaceholder')}
 								placeholder={t('infoAlbumArtistPlaceholder')}
 								onInput={(e) => {
@@ -209,7 +229,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 												: t('infoSubmitTitle')
 										}
 										onClick={() => {
-											saveEdit(tab, clonedSong, {
+											saveEdit(props.tab, clonedSong(), {
 												artist: artist(),
 												track: track(),
 												album: album() || null,
@@ -229,7 +249,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 												: t('infoSwapTitle')
 										}
 										onClick={() => {
-											saveEdit(tab, clonedSong, {
+											saveEdit(props.tab, clonedSong(), {
 												artist: track(),
 												track: artist(),
 												album: album() || null,
@@ -259,7 +279,7 @@ export default function Edit(props: { tab: Resource<ManagerTab> }) {
 
 function EditContextMenu(props: {
 	tab: Resource<ManagerTab>;
-	clonedSong: ClonedSong;
+	clonedSong: ClonedSong | undefined;
 	setIsRegex: Setter<boolean>;
 	track: Accessor<string>;
 	artist: Accessor<string>;
@@ -276,7 +296,7 @@ function EditContextMenu(props: {
 						: 'infoSubmitTitleShort',
 				icon: Check,
 				action: () =>
-					saveEdit(props.tab, props.clonedSong, {
+					void saveEdit(props.tab, props.clonedSong, {
 						artist: props.artist(),
 						track: props.track(),
 						album: props.album() || null,
@@ -290,7 +310,7 @@ function EditContextMenu(props: {
 						: 'infoSwapTitleShort',
 				icon: PublishedWithChanges,
 				action: () =>
-					saveEdit(props.tab, props.clonedSong, {
+					void saveEdit(props.tab, props.clonedSong, {
 						artist: props.track(),
 						track: props.artist(),
 						album: props.album() || null,
@@ -323,7 +343,7 @@ function EditContextMenu(props: {
  */
 async function saveEdit(
 	tab: Resource<ManagerTab>,
-	clonedSong: ClonedSong,
+	clonedSong: ClonedSong | undefined,
 	data: {
 		artist: string;
 		track: string;
@@ -331,7 +351,10 @@ async function saveEdit(
 		albumArtist: string | null;
 	}
 ) {
-	// Save edit remotely if supported, else us browser storage.
+	if (!clonedSong) {
+		return;
+	}
+
 	if (!(await sharedSavedEdits.put(clonedSong, data))) {
 		await savedEdits.saveSongInfo(clonedSong, data);
 	}

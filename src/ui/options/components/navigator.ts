@@ -12,6 +12,7 @@ import FAQ from '@/ui/options/components/faq';
 import ContactComponent from '@/ui/options/components/contact';
 import OptionsComponent from '@/ui/options/components/options/options';
 import Accounts from '@/ui/options/components/accounts';
+import Tune from '@suid/icons-material/TuneOutlined';
 import ToggleOn from '@suid/icons-material/ToggleOnOutlined';
 import ToggleOff from '@suid/icons-material/ToggleOffOutlined';
 import Timer from '@suid/icons-material/TimerOutlined';
@@ -26,6 +27,7 @@ import {
 	getCurrentTab,
 } from '@/core/background/util';
 import * as ControllerMode from '@/core/object/controller/controller-mode';
+import AdvancedOptionsComponent from './advanced-settings';
 
 /**
  * Type indicating possible states for modal
@@ -93,10 +95,21 @@ export const connectorOverrideOptionsItem: NavigatorNavigationButton = {
 	element: ConnectorOverrideOptions,
 };
 
+export const advancedOptionsItem: NavigatorNavigationButton = {
+	namei18n: 'optionsAdvanced',
+	icon: Tune,
+	element: AdvancedOptionsComponent,
+};
+
 export const optionsGroup: NavigatorButtonGroup = {
 	namei18n: 'optionsOptions',
 	icon: Settings,
-	group: [optionsItem, editOptionsItem, connectorOverrideOptionsItem],
+	group: [
+		optionsItem,
+		editOptionsItem,
+		connectorOverrideOptionsItem,
+		advancedOptionsItem,
+	],
 };
 
 export const contactItem: NavigatorNavigationButton = {
@@ -136,7 +149,7 @@ export const settings: Navigator = [
 	accountItem,
 	optionsGroup,
 	aboutGroup,
-	// #v-ifndef VITE_SAFARI
+	// #v-ifdef !VITE_SAFARI
 	showSomeLoveItem,
 	// #v-endif
 ];
@@ -189,7 +202,7 @@ export async function getMobileNavigatorGroup(): Promise<NavigatorButtonGroup> {
 				action: () => {
 					browser.tabs.create({
 						url: browser.runtime.getURL(
-							'src/ui/options/index.html'
+							'src/ui/options/index.html',
 						),
 					});
 				},
@@ -205,7 +218,7 @@ export async function getMobileNavigatorGroup(): Promise<NavigatorButtonGroup> {
 
 export function triggerNavigationButton(
 	button: NavigatorButton | NavigatorButtonGroup,
-	setActiveSetting: Setter<NavigatorNavigationButton>
+	setActiveSetting: Setter<NavigatorNavigationButton>,
 ) {
 	if ('group' in button) {
 		return;
@@ -225,7 +238,7 @@ export function triggerNavigationButton(
  * @returns true if item is singular, false if item is a group
  */
 export function itemIsSingular(
-	item: NavigatorButton | NavigatorButtonGroup
+	item: NavigatorButton | NavigatorButtonGroup,
 ): item is NavigatorButton {
 	return !('group' in item);
 }

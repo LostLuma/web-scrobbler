@@ -47,15 +47,17 @@ import {
  * Component showing info for currently playing song if there is one
  */
 export default function NowPlaying(props: { tab: Resource<ManagerTab> }) {
-	const { tab } = props;
-
 	const [isEditing, setIsEditing] = createSignal(false);
 
 	const song = createMemo(() => {
-		const rawTab = tab();
-		if (!rawTab) return null;
+		const rawTab = props.tab();
+		if (!rawTab) {
+			return null;
+		}
 		const rawSong = rawTab.song;
-		if (!rawSong) return null;
+		if (!rawSong) {
+			return null;
+		}
 		return new ClonedSong(rawSong, rawTab.tabId);
 	});
 
@@ -100,13 +102,13 @@ export default function NowPlaying(props: { tab: Resource<ManagerTab> }) {
 	return (
 		<Switch fallback={<Base />}>
 			<Match when={isEditing()}>
-				<EditComponent tab={tab} />
+				<EditComponent tab={props.tab} />
 			</Match>
 			<Match when={song()}>
 				<Show when={isIos()}>
 					<NowPlayingContextMenu
 						song={song}
-						tab={tab}
+						tab={props.tab}
 						setIsEditing={setIsEditing}
 					/>
 				</Show>
@@ -119,20 +121,32 @@ export default function NowPlaying(props: { tab: Resource<ManagerTab> }) {
 						}
 						title={t('infoOpenAlbumArt')}
 					>
-						<img
-							class={styles.coverArt}
-							src={
-								song()?.getTrackArt() ??
-								browser.runtime.getURL(
-									'img/cover_art_default.png'
-								)
-							}
-						/>
+						<div
+							class={styles.coverArtBackground}
+							style={{
+								'background-image': `url(${
+									song()?.getTrackArt() ??
+									browser.runtime.getURL(
+										'img/cover_art_default.png',
+									)
+								})`,
+							}}
+						>
+							<img
+								class={styles.coverArt}
+								src={
+									song()?.getTrackArt() ??
+									browser.runtime.getURL(
+										'img/cover_art_default.png',
+									)
+								}
+							/>
+						</div>
 						<Squircle id="coverArtClip" />
 					</PopupLink>
 					<SongDetails
 						song={song}
-						tab={tab}
+						tab={props.tab}
 						setIsEditing={setIsEditing}
 					/>
 				</div>
@@ -193,18 +207,17 @@ function SongDetails(props: {
 	tab: Resource<ManagerTab>;
 	setIsEditing: Setter<boolean>;
 }) {
-	const { song, tab } = props;
 	return (
 		<div class={styles.songDetails}>
-			<TrackData song={song} />
+			<TrackData song={props.song} />
 			<Show when={isIos()}>
-				<IOSLoveTrack song={song} tab={tab} />
+				<IOSLoveTrack song={props.song} tab={props.tab} />
 			</Show>
-			<TrackMetadata song={song} />
+			<TrackMetadata song={props.song} />
 			<Show when={!isIos()}>
 				<TrackControls
-					song={song}
-					tab={tab}
+					song={props.song}
+					tab={props.tab}
 					setIsEditing={props.setIsEditing}
 				/>
 			</Show>
@@ -219,14 +232,17 @@ function IOSLoveTrack(props: {
 	tab: Resource<ManagerTab>;
 	song: Accessor<ClonedSong | null>;
 }) {
-	const { tab, song } = props;
 	return (
 		<button
 			class={`${styles.iosLoveButton}${
-				song()?.metadata.userloved ? ` ${styles.active}` : ''
+				props.song()?.metadata.userloved ? ` ${styles.active}` : ''
 			}`}
-			onClick={() => toggleLove(tab, song)}
-			title={song()?.metadata.userloved ? t('infoUnlove') : t('infoLove')}
+			onClick={() => toggleLove(props.tab, props.song)}
+			title={
+				props.song()?.metadata.userloved
+					? t('infoUnlove')
+					: t('infoLove')
+			}
 		>
 			<Favorite />
 		</button>
@@ -237,36 +253,41 @@ function IOSLoveTrack(props: {
  * The component showing the track data.
  */
 function TrackData(props: { song: Accessor<ClonedSong | null> }) {
-	const { song } = props;
 	return (
 		<>
 			<PopupLink
 				class={styles.bold}
-				href={createTrackURL(song()?.getArtist(), song()?.getTrack())}
-				title={t('infoViewTrackPage', song()?.getTrack() ?? '')}
+				href={createTrackURL(
+					props.song()?.getArtist(),
+					props.song()?.getTrack(),
+				)}
+				title={t('infoViewTrackPage', props.song()?.getTrack() ?? '')}
 			>
-				{song()?.getTrack()}
+				{props.song()?.getTrack()}
 			</PopupLink>
 			<PopupLink
-				href={createArtistURL(song()?.getArtist())}
-				title={t('infoViewArtistPage', song()?.getArtist() ?? '')}
+				href={createArtistURL(props.song()?.getArtist())}
+				title={t('infoViewArtistPage', props.song()?.getArtist() ?? '')}
 			>
-				{song()?.getArtist()}
+				{props.song()?.getArtist()}
 			</PopupLink>
 			<PopupLink
 				href={createAlbumURL(
-					song()?.getAlbumArtist() || song()?.getArtist(),
-					song()?.getAlbum()
+					props.song()?.getAlbumArtist() || props.song()?.getArtist(),
+					props.song()?.getAlbum(),
 				)}
-				title={t('infoViewAlbumPage', song()?.getAlbum() ?? '')}
+				title={t('infoViewAlbumPage', props.song()?.getAlbum() ?? '')}
 			>
-				{song()?.getAlbum()}
+				{props.song()?.getAlbum()}
 			</PopupLink>
 			<PopupLink
-				href={createArtistURL(song()?.getAlbumArtist())}
-				title={t('infoViewArtistPage', song()?.getAlbumArtist() ?? '')}
+				href={createArtistURL(props.song()?.getAlbumArtist())}
+				title={t(
+					'infoViewArtistPage',
+					props.song()?.getAlbumArtist() ?? '',
+				)}
 			>
-				{song()?.getAlbumArtist()}
+				{props.song()?.getAlbumArtist()}
 			</PopupLink>
 		</>
 	);
@@ -276,8 +297,6 @@ function TrackData(props: { song: Accessor<ClonedSong | null> }) {
  * The component showing the number of times scrobbled and the connector.
  */
 function TrackMetadata(props: { song: Accessor<ClonedSong | null> }) {
-	const { song } = props;
-
 	const [session, setSession] = createSignal<SessionData>();
 	scrobbleService
 		.getScrobblerByLabel('Last.fm')
@@ -290,18 +309,18 @@ function TrackMetadata(props: { song: Accessor<ClonedSong | null> }) {
 				class={`${styles.playCount} ${styles.label}`}
 				href={createTrackLibraryURL(
 					session()?.sessionName,
-					song()?.getArtist(),
-					song()?.getTrack()
+					props.song()?.getArtist(),
+					props.song()?.getTrack(),
 				)}
 				title={t(
 					'infoYourScrobbles',
-					(song()?.metadata.userPlayCount || 0).toString()
+					(props.song()?.metadata.userPlayCount || 0).toString(),
 				)}
 			>
 				<LastFMIcon />
-				{song()?.metadata.userPlayCount || 0}
+				{props.song()?.metadata.userPlayCount || 0}
 			</PopupLink>
-			<span class={styles.label}>{song()?.connectorLabel}</span>
+			<span class={styles.label}>{props.song()?.connectorLabel}</span>
 		</div>
 	);
 }
@@ -314,14 +333,13 @@ function TrackControls(props: {
 	tab: Resource<ManagerTab>;
 	setIsEditing: Setter<boolean>;
 }) {
-	const { song, tab } = props;
 	return (
 		<div class={styles.controlButtons}>
 			<button
 				class={styles.controlButton}
-				disabled={tab()?.mode !== ControllerMode.Playing}
+				disabled={props.tab()?.mode !== ControllerMode.Playing}
 				title={
-					tab()?.mode === ControllerMode.Playing
+					props.tab()?.mode === ControllerMode.Playing
 						? t('infoEditTitle')
 						: t('infoEditUnableTitle')
 				}
@@ -329,43 +347,45 @@ function TrackControls(props: {
 			>
 				<Edit />
 			</button>
-			<Show when={song()?.flags.isCorrectedByUser}>
+			<Show when={props.song()?.flags.isCorrectedByUser}>
 				<button
 					class={styles.controlButton}
-					disabled={tab()?.mode !== ControllerMode.Playing}
+					disabled={props.tab()?.mode !== ControllerMode.Playing}
 					title={
-						tab()?.mode === ControllerMode.Playing
+						props.tab()?.mode === ControllerMode.Playing
 							? t('infoRevertTitle')
 							: t('infoRevertUnableTitle')
 					}
-					onClick={() => actionResetSongData(tab)}
+					onClick={() => actionResetSongData(props.tab)}
 				>
 					<RestartAlt />
 				</button>
 			</Show>
 			<button
 				class={`${styles.controlButton}${
-					tab()?.mode !== ControllerMode.Scrobbled
+					props.tab()?.mode !== ControllerMode.Scrobbled
 						? ` ${styles.hiddenDisabled}`
 						: ''
 				}${
-					tab()?.mode === ControllerMode.Skipped
+					props.tab()?.mode === ControllerMode.Skipped
 						? ` ${styles.active}`
 						: ''
 				}`}
-				disabled={tab()?.mode !== ControllerMode.Playing}
-				onClick={() => actionSkipCurrentSong(tab)}
-				title={t(getSkipLabel(tab, false))}
+				disabled={props.tab()?.mode !== ControllerMode.Playing}
+				onClick={() => actionSkipCurrentSong(props.tab)}
+				title={t(getSkipLabel(props.tab, false))}
 			>
 				<Block />
 			</button>
 			<button
 				class={`${styles.controlButton}${
-					song()?.metadata.userloved ? ` ${styles.active}` : ''
+					props.song()?.metadata.userloved ? ` ${styles.active}` : ''
 				}`}
-				onClick={() => toggleLove(tab, song)}
+				onClick={() => toggleLove(props.tab, props.song)}
 				title={
-					song()?.metadata.userloved ? t('infoUnlove') : t('infoLove')
+					props.song()?.metadata.userloved
+						? t('infoUnlove')
+						: t('infoLove')
 				}
 			>
 				<span class={styles.nonHover}>
@@ -373,7 +393,7 @@ function TrackControls(props: {
 				</span>
 				<span class={styles.hover}>
 					<Show
-						when={song()?.metadata.userloved}
+						when={props.song()?.metadata.userloved}
 						fallback={<Favorite />}
 					>
 						<HeartBroken />
@@ -458,7 +478,7 @@ function actionResetSongData(tab: Resource<ManagerTab>) {
  */
 function toggleLove(
 	tab: Resource<ManagerTab>,
-	song: Accessor<ClonedSong | null>
+	song: Accessor<ClonedSong | null>,
 ) {
 	sendBackgroundMessage(tab()?.tabId ?? -1, {
 		type: 'toggleLove',

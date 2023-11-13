@@ -12,16 +12,18 @@ export default function ContactComponent() {
 	return (
 		<>
 			<h1>{t('contactTitle')}</h1>
-			<ul class={styles.contactList}>
+			<ul class={`${styles.contactList} ${styles.optionList}`}>
 				<a
 					href="https://github.com/web-scrobbler/web-scrobbler/issues"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					<li class={styles.contactEntry}>
+					<li
+						class={`${styles.contactEntry} ${styles.contactGithub}`}
+					>
 						<img
 							class={styles.invertImg}
-							src={githubIcon}
+							src={githubIcon as string}
 							alt=""
 							width={32}
 							height={32}
@@ -33,7 +35,7 @@ export default function ContactComponent() {
 							width={78}
 							height={32}
 						/>
-						<span class={styles.githubSpan}>
+						<span class={styles.desc}>
 							{t('contactGitHubDesc')}
 						</span>
 					</li>
@@ -43,14 +45,17 @@ export default function ContactComponent() {
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					<li class={styles.contactEntry}>
-						<img src={twitterBird} alt="" width={32} height={32} />
-						<span
-							class={`${styles.brandText} ${styles.twitterBrandText}`}
-						>
-							Twitter
-						</span>
-						<span class={styles.twitterSpan}>
+					<li
+						class={`${styles.contactEntry} ${styles.contactTwitter}`}
+					>
+						<img
+							src={twitterBird as string}
+							alt=""
+							width={32}
+							height={32}
+						/>
+						<span class={styles.brandText}>Twitter</span>
+						<span class={styles.desc}>
 							{t('contactTwitterDesc')}
 						</span>
 					</li>
@@ -60,10 +65,12 @@ export default function ContactComponent() {
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					<li class={styles.contactEntry}>
+					<li
+						class={`${styles.contactEntry} ${styles.contactPrivacy}`}
+					>
 						<Lock />
 						<span class={styles.brandText}>Privacy</span>
-						<span class={styles.privacySpan}>
+						<span class={styles.desc}>
 							{t('contactPrivacyPolicyDesc')}
 						</span>
 					</li>
