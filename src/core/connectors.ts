@@ -293,6 +293,15 @@ export default <ConnectorMeta[]>[
 		id: 'radionomy',
 	},
 	{
+		label: 'J1 Radio',
+		matches: [
+			'*://www.j1fm.tokyo/player/*',
+			'*://www.j1fm.tokyo/michi/player/*',
+		],
+		js: 'aiircom.js',
+		id: 'j1-radio',
+	},
+	{
 		label: 'JazzAndRain',
 		matches: ['*://*.jazzandrain.com/*'],
 		js: 'jazzandrain.js',
@@ -369,6 +378,12 @@ export default <ConnectorMeta[]>[
 		matches: ['*://www.audacy.com/*'],
 		js: 'audacy.js',
 		id: 'audacy',
+	},
+	{
+		label: 'Audius',
+		matches: ['*://audius.co/*'],
+		js: 'audius.js',
+		id: 'audius',
 	},
 	{
 		label: 'GetWorkDoneMusic',
@@ -476,6 +491,12 @@ export default <ConnectorMeta[]>[
 		matches: ['*://www.beatport.com/*'],
 		js: 'beatport.js',
 		id: 'beatport',
+	},
+	{
+		label: 'Beeline Music',
+		matches: ['*://music.beeline.ru/*'],
+		js: 'beeline-music.js',
+		id: 'beeline-music',
 	},
 	{
 		label: 'wavo',
@@ -663,6 +684,12 @@ export default <ConnectorMeta[]>[
 		matches: ['*://qcbeats.org/*'],
 		js: 'musicat.js',
 		id: 'qcbeats',
+	},
+	{
+		label: 'Q-Dance',
+		matches: ['*://www.q-dance.com/*'],
+		js: 'q-dance.js',
+		id: 'q-dance',
 	},
 	{
 		label: 'Sawdust City Sounds',
@@ -1168,6 +1195,12 @@ export default <ConnectorMeta[]>[
 		id: 'pretzel',
 	},
 	{
+		label: 'Primordial Radio',
+		matches: ['*://primordialradio.com/*'],
+		js: 'primordialradio.js',
+		id: 'primordialradio',
+	},
+	{
 		label: 'Radio Kyivstar',
 		matches: ['*://radio.kyivstar.ua/*'],
 		js: 'kyivstar.js',
@@ -1242,7 +1275,7 @@ export default <ConnectorMeta[]>[
 	},
 	{
 		label: 'RadioJavan',
-		matches: ['*://www.radiojavan.com/*'],
+		matches: ['*://play.radiojavan.com/*'],
 		js: 'radiojavan.js',
 		id: 'radiojavan',
 	},
@@ -2236,5 +2269,11 @@ export default <ConnectorMeta[]>[
 		matches: ['*://*.wdr.de/radio/*'],
 		js: 'wdr.js',
 		id: 'wdr',
+	},
+	{
+		label: 'FMSpins',
+		matches: ['*://*.fmspins.com/*'],
+		js: 'fmspins.js',
+		id: 'fmspins',
 	},
 ];
