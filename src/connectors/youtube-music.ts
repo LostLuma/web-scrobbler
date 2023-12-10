@@ -109,7 +109,8 @@ Connector.getUniqueID = () => {
 	if (videoUrl) {
 		return Util.getYtVideoIdFromUrl(videoUrl);
 	}
-	return null;
+
+	return new URLSearchParams(window.location.search).get('v');
 };
 
 Connector.isScrobblingAllowed = () => !Util.isElementVisible(adSelector);
