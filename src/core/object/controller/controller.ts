@@ -3,6 +3,7 @@ import * as Options from '@/core/storage/options';
 import {
 	areAllResults,
 	DebugLogType,
+	parseScrobblePercent,
 	getSecondsToScrobble,
 	isAnyResult,
 } from '@/util/util';
@@ -25,6 +26,7 @@ import * as BrowserStorage from '@/core/storage/browser-storage';
 import { debugLog } from '@/core/content/util';
 import browser from 'webextension-polyfill';
 import BaseConnector from '@/core/content/connector';
+import Blocklist from '@/core/storage/blocklist';
 
 /**
  * List of song fields used to check if song is changed. If any of
@@ -72,15 +74,10 @@ export default class Controller {
 	private currentSong: Song | null = null;
 	private isReplayingSong = false;
 	private shouldScrobblePodcasts = true;
+	private blocklist: Blocklist;
 
 	private forceScrobble = false;
 	private shouldHaveScrobbled = false;
-	private shouldScrobble = () => {
-		if (this.forceScrobble) {
-			return true;
-		}
-		return this.currentSong?.parsed.isScrobblingAllowed;
-	};
 
 	private isEditing = false;
 	private setNotEditingTimeout = setTimeout(() => {
@@ -91,6 +88,21 @@ export default class Controller {
 		type: 'getTabId',
 		payload: undefined,
 	});
+
+	/**
+	 * @returns true if song should scrobble; false if disallowed.
+	 */
+	private async shouldScrobble() {
+		if (this.forceScrobble) {
+			return true;
+		}
+		return (
+			this.currentSong?.parsed.isScrobblingAllowed &&
+			(await this.blocklist.shouldScrobbleChannel(
+				this.connector.getChannelInfo?.()?.id,
+			))
+		);
+	}
 
 	/**
 	 * Function that handles updating the scrobble info box
@@ -192,6 +204,7 @@ export default class Controller {
 	 */
 	constructor(connector: BaseConnector, isEnabled: boolean) {
 		this.connector = connector;
+		this.blocklist = new Blocklist(this.connector.meta.id);
 		this.isEnabled = isEnabled;
 		this.mode = isEnabled ? ControllerMode.Base : ControllerMode.Disabled;
 		this.setMode(this.mode);
@@ -285,6 +298,35 @@ export default class Controller {
 					}
 				},
 			}),
+			contentListener({
+				type: 'getChannelDetails',
+				fn: () => ({
+					connector: this.connector.meta,
+					channelInfo: this.connector.getChannelInfo?.(),
+				}),
+			}),
+			contentListener({
+				type: 'addToBlocklist',
+				fn: async () => {
+					await this.blocklist.addToBlocklist(
+						this.connector.getChannelInfo?.() ?? null,
+					);
+					this.setMode(ControllerMode.Disallowed);
+				},
+			}),
+			contentListener({
+				type: 'removeFromBlocklist',
+				fn: async () => {
+					await this.blocklist.removeFromBlocklist(
+						this.connector.getChannelInfo?.()?.id ?? null,
+					);
+					if (this.shouldHaveScrobbled) {
+						void this.scrobbleSong();
+					} else {
+						void this.setSongNowPlaying();
+					}
+				},
+			}),
 		);
 	}
 
@@ -321,7 +363,11 @@ export default class Controller {
 		switch (event) {
 			case ControllerEvents.SongNowPlaying: {
 				const song = this.getCurrentSong();
-				if (!song || song.flags.isReplaying || !this.shouldScrobble()) {
+				if (
+					!song ||
+					song.flags.isReplaying ||
+					!(await this.shouldScrobble())
+				) {
 					break;
 				}
 				const id = await this.tabId;
@@ -352,7 +398,7 @@ export default class Controller {
 			}
 			case ControllerEvents.SongUnrecognized: {
 				const song = this.getCurrentSong();
-				if (!song || !this.shouldScrobble()) {
+				if (!song || !(await this.shouldScrobble())) {
 					break;
 				}
 				const id = await this.tabId;
@@ -652,7 +698,7 @@ export default class Controller {
 	 * Process connector state as current one.
 	 * @param newState - Connector state
 	 */
-	private processCurrentState(newState: State): void {
+	private async processCurrentState(newState: State): Promise<void> {
 		if (!assertSongNotNull(this.currentSong)) {
 			return;
 		}
@@ -683,7 +729,7 @@ export default class Controller {
 			this.onPlayingStateChanged(isPlaying);
 		} else if (
 			this.mode === ControllerMode.Disallowed &&
-			this.shouldScrobble() &&
+			(await this.shouldScrobble()) &&
 			isPlaying
 		) {
 			// we need to unset disallowed whenever needed.
@@ -712,7 +758,7 @@ export default class Controller {
 			return;
 		}
 
-		if (this.shouldScrobble()) {
+		if (await this.shouldScrobble()) {
 			this.setMode(ControllerMode.Loading);
 		} else {
 			this.setMode(ControllerMode.Disallowed);
@@ -741,7 +787,7 @@ export default class Controller {
 			 * If the song is playing, mark it immediately;
 			 * otherwise will be flagged in isPlaying binding.
 			 */
-			if (!this.shouldScrobble()) {
+			if (!(await this.shouldScrobble())) {
 				this.setMode(ControllerMode.Disallowed);
 			} else if (this.currentSong.parsed.isPlaying) {
 				/*
@@ -787,7 +833,7 @@ export default class Controller {
 	 * Called when playing state is changed.
 	 * @param value - New playing state
 	 */
-	private onPlayingStateChanged(value: boolean | null): void {
+	private async onPlayingStateChanged(value: boolean | null): Promise<void> {
 		this.debugLog(`isPlaying state changed to ${String(value)}`);
 
 		if (value && this.currentSong) {
@@ -801,7 +847,7 @@ export default class Controller {
 			if (
 				!isMarkedAsPlaying &&
 				this.currentSong.isValid() &&
-				this.shouldScrobble()
+				(await this.shouldScrobble())
 			) {
 				void this.setSongNowPlaying();
 			} else {
@@ -880,13 +926,11 @@ export default class Controller {
 			return;
 		}
 
-		const percent = await Options.getOption(
+		const rawPercent = await Options.getOption(
 			Options.SCROBBLE_PERCENT,
 			this.connector.meta.id,
 		);
-		if (typeof percent !== 'number') {
-			return;
-		}
+		const percent = parseScrobblePercent(rawPercent);
 
 		const secondsToScrobble = getSecondsToScrobble(duration, percent);
 
@@ -911,7 +955,10 @@ export default class Controller {
 	 * now playing.
 	 */
 	private async setSongNowPlaying(): Promise<void> {
-		if (!assertSongNotNull(this.currentSong) || !this.shouldScrobble()) {
+		if (
+			!assertSongNotNull(this.currentSong) ||
+			!(await this.shouldScrobble())
+		) {
 			return;
 		}
 		this.currentSong.flags.isMarkedAsPlaying = true;
@@ -935,7 +982,10 @@ export default class Controller {
 	}
 
 	private async setPaused(): Promise<void> {
-		if (!assertSongNotNull(this.currentSong) || !this.shouldScrobble()) {
+		if (
+			!assertSongNotNull(this.currentSong) ||
+			!(await this.shouldScrobble())
+		) {
 			return;
 		}
 		await sendContentMessage({
@@ -947,7 +997,10 @@ export default class Controller {
 	}
 
 	private async setResumedPlaying(): Promise<void> {
-		if (!assertSongNotNull(this.currentSong) || !this.shouldScrobble()) {
+		if (
+			!assertSongNotNull(this.currentSong) ||
+			!(await this.shouldScrobble())
+		) {
 			return;
 		}
 		await sendContentMessage({
@@ -1002,7 +1055,7 @@ export default class Controller {
 			return;
 		}
 
-		if (!this.shouldScrobble()) {
+		if (!(await this.shouldScrobble())) {
 			this.shouldHaveScrobbled = true;
 			return;
 		}

@@ -4,6 +4,11 @@ export interface ConnectorMeta {
 	js: string;
 	id: string;
 	allFrames?: true;
+
+	/**
+	 * true if connector uses blocklist. Connector must implement {@link Connector.getChannelId}
+	 */
+	usesBlocklist?: true;
 }
 
 export default <ConnectorMeta[]>[
@@ -12,6 +17,7 @@ export default <ConnectorMeta[]>[
 		matches: ['*://www.youtube.com/*', '*://m.youtube.com/*'],
 		js: 'youtube.js',
 		id: 'youtube',
+		usesBlocklist: true,
 	},
 	{
 		label: 'MySpace',
@@ -38,6 +44,12 @@ export default <ConnectorMeta[]>[
 		js: 'bndcmpr.js',
 		id: 'bndcmpr',
 		allFrames: true,
+	},
+	{
+		label: 'Buy Music Club',
+		matches: ['*://www.buymusic.club/*'],
+		js: 'buymusicclub.js',
+		id: 'buymusicclub',
 	},
 	{
 		label: 'Pandora',
@@ -139,6 +151,17 @@ export default <ConnectorMeta[]>[
 		id: '8tracks',
 	},
 	{
+		label: 'Radio Cidade',
+		matches: [
+			'*://radiocidade.fm/player/*',
+			'*://play.radiomania.com.br/*',
+			'*://*.melodia.com.br/*',
+			'*://jb.fm/player/*',
+		],
+		js: 'radiocidade.js',
+		id: 'radiocidade',
+	},
+	{
 		label: 'Radio Nova',
 		matches: ['*://www.nova.fr/*'],
 		js: 'nova.js',
@@ -149,6 +172,12 @@ export default <ConnectorMeta[]>[
 		matches: ['*://www.radioplus.be/*', '*://radioplus.be/*'],
 		js: 'radioplus.js',
 		id: 'radioplus',
+	},
+	{
+		label: 'Радио Premium',
+		matches: ['*://rpfm.ru/*'],
+		js: 'rpfm.js',
+		id: 'rpfm',
 	},
 	{
 		label: 'Douban.FM',
@@ -243,6 +272,12 @@ export default <ConnectorMeta[]>[
 		matches: ['*://odnoklassniki.ru/*', '*://ok.ru/*'],
 		js: 'odnoklassniki.js',
 		id: 'odnoklassniki',
+	},
+	{
+		label: 'Overcast',
+		matches: ['*://overcast.fm/*'],
+		js: 'overcast.js',
+		id: 'overcast',
 	},
 	{
 		label: 'Online Radio Box',
@@ -1026,7 +1061,7 @@ export default <ConnectorMeta[]>[
 	},
 	{
 		label: 'SiriusXM',
-		matches: ['*://player.siriusxm.com/*', '*://player.siriusxm.ca/*'],
+		matches: ['*://www.siriusxm.com/*', '*://www.siriusxm.ca/*'],
 		js: 'siriusxm-player.js',
 		id: 'siriusxm-player',
 	},
@@ -2271,9 +2306,40 @@ export default <ConnectorMeta[]>[
 		id: 'wdr',
 	},
 	{
+		label: 'radio.de',
+		matches: ['*://www.radio.de/*'],
+		js: 'radio.de.js',
+		id: 'radiode',
+	},
+	{
 		label: 'FMSpins',
 		matches: ['*://*.fmspins.com/*'],
 		js: 'fmspins.js',
 		id: 'fmspins',
+	},
+	{
+		label: 'vk-save',
+		matches: ['*://*.vk-save.com/*'],
+		js: 'vk-save.js',
+		id: 'vk-save',
+	},
+	{
+		label: 'Radio Student',
+		matches: ['*://www.radiostudent.hr/*'],
+		js: 'radiostudent.js',
+		id: 'radiostudent',
+	},
+	{
+		label: 'BiliBili',
+		matches: ['*://www.bilibili.com/*'],
+		js: 'bilibili.js',
+		id: 'bilibili',
+		usesBlocklist: true,
+	},
+	{
+		label: 'jam.coop',
+		matches: ['*://jam.coop/*'],
+		js: 'jam.coop.js',
+		id: 'jam.coop',
 	},
 ];

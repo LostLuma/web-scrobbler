@@ -10,6 +10,7 @@ import {
 	WebhookModel,
 	Properties,
 	StateManagement,
+	Blocklists,
 } from '@/core/storage/wrapper';
 import { RegexEdit } from './regex';
 
@@ -25,6 +26,12 @@ export const HIDDEN_PLACEHOLDER = '[hidden]';
  * This value is used only if no duration was parsed or loaded.
  */
 export const DEFAULT_SCROBBLE_TIME = 30;
+
+/**
+ * Percentage of track to playback before the track is scrobbled.
+ * This value is used only if scrobble percent storage is somehow corrupted.
+ */
+export const DEFAULT_SCROBBLE_PERCENT = 50;
 
 /**
  * Minimum number of seconds of scrobbleable track.
@@ -52,6 +59,22 @@ export function debugLog(text: unknown, logType: DebugLogType = 'log'): void {
 
 	/* istanbul ignore next */
 	logFunc(text);
+}
+
+/**
+ * Narrow the typing of scrobble percent.
+ * Fallback to default if scrobble percent is not a number.
+ *
+ * @param percent - Scrobble percent value from settings
+ * @returns percentage of track to play before scrobbling
+ */
+export function parseScrobblePercent(percent: unknown): number {
+	return percent &&
+		typeof percent === 'number' &&
+		!isNaN(percent) &&
+		isFinite(percent)
+		? percent
+		: DEFAULT_SCROBBLE_PERCENT;
 }
 
 /**
@@ -115,7 +138,8 @@ export function hideObjectValue(
 		| ListenBrainzModel
 		| WebhookModel
 		| StateManagement
-		| RegexEdit[],
+		| RegexEdit[]
+		| Blocklists,
 ): string {
 	if (!keyValue) {
 		if (keyValue === null) {

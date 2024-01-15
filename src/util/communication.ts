@@ -1,4 +1,5 @@
 import { ConnectorMeta } from '@/core/connectors';
+import type { ChannelInfo } from '@/core/content/util';
 import { ControllerModeStr } from '@/core/object/controller/controller';
 import { ServiceCallResult } from '@/core/object/service-call-result';
 import { CloneableSong } from '@/core/object/song';
@@ -155,6 +156,21 @@ interface BackgroundCommunications {
 	forceScrobbleSong: {
 		payload: undefined;
 		response: void;
+	};
+	addToBlocklist: {
+		payload: undefined;
+		response: Promise<void>;
+	};
+	removeFromBlocklist: {
+		payload: undefined;
+		response: Promise<void>;
+	};
+	getChannelDetails: {
+		payload: undefined;
+		response: {
+			connector: ConnectorMeta;
+			channelInfo: ChannelInfo | null | undefined;
+		};
 	};
 }
 
