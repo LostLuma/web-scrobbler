@@ -32,6 +32,7 @@ import { CloneableSong } from '@/core/object/song';
 import {
 	clearNowPlaying,
 	showAuthNotification,
+	showLovedNotification,
 	showNowPlaying,
 	showSongNotRecognized,
 } from '@/util/notifications';
@@ -76,6 +77,7 @@ browser.commands?.onCommand.addListener(
  */
 async function commandHandler(command: string) {
 	const tab = await getCurrentTab();
+	const alreadyLoved = tab.song?.metadata.userloved;
 
 	switch (command) {
 		case 'toggle-connector':
@@ -86,10 +88,18 @@ async function commandHandler(command: string) {
 			}
 			break;
 		case 'love-song':
-			setLoveStatus(tab.tabId, true);
+			// only set love status if song is not yet loved, ignore if song is already loved
+			// only send notification when song is unloved but will be loved
+			if (!alreadyLoved) {
+				setLoveStatus(tab.tabId, true, true);
+			}
 			break;
 		case 'unlove-song':
-			setLoveStatus(tab.tabId, false);
+			// only set unlove status if song is loved, ignore if song is unloved
+			// only send notification when song is loved but will be unloved
+			if (alreadyLoved) {
+				setLoveStatus(tab.tabId, false, true);
+			}
 			break;
 	}
 }
@@ -99,13 +109,19 @@ async function commandHandler(command: string) {
  *
  * @param tabId	- Tab ID of the tab to update
  * @param isLoved - Whether the song is loved
+ * @param shouldShowNotification - Whether the song should show notification when (un)loved
  *
  */
-function setLoveStatus(tabId: number, isLoved: boolean) {
+function setLoveStatus(
+	tabId: number,
+	isLoved: boolean,
+	shouldShowNotification: boolean,
+) {
 	sendBackgroundMessage(tabId ?? -1, {
 		type: 'toggleLove',
 		payload: {
 			isLoved,
+			shouldShowNotification,
 		},
 	});
 }
@@ -236,6 +252,7 @@ async function updateTab(
 			fn({
 				tabId,
 				mode: ControllerMode.Unsupported,
+				permanentMode: ControllerMode.Unsupported,
 				song: null,
 			}),
 			...activeTabs,
@@ -261,10 +278,15 @@ async function updateTab(
  * @param tabId - ID of the tab to update mode of
  * @param mode - New controller mode
  */
-async function updateMode(tabId: number | undefined, mode: ControllerModeStr) {
+async function updateMode(
+	tabId: number | undefined,
+	mode: ControllerModeStr,
+	permanentMode: ControllerModeStr,
+) {
 	await updateTab(tabId, (oldTab) => ({
 		tabId: oldTab.tabId,
 		mode,
+		permanentMode,
 		song: oldTab.song,
 	}));
 }
@@ -282,6 +304,7 @@ async function updateState(
 	await updateTab(tabId, (oldTab) => ({
 		tabId: oldTab.tabId,
 		mode: oldTab.mode,
+		permanentMode: oldTab.permanentMode,
 		song,
 	}));
 }
@@ -293,8 +316,8 @@ setupBackgroundListeners(
 	 */
 	backgroundListener({
 		type: 'controllerModeChange',
-		fn: (mode, sender) => {
-			updateMode(sender.tab?.id, mode);
+		fn: ({ mode, permanentMode }, sender) => {
+			updateMode(sender.tab?.id, mode, permanentMode);
 			console.log(`changed mode to ${mode} in tab ${sender.tab?.id}`);
 		},
 	}),
@@ -384,7 +407,12 @@ setupBackgroundListeners(
 	backgroundListener({
 		type: 'scrobble',
 		fn: (payload, sender) => {
-			return scrobble(new ClonedSong(payload.song, sender.tab?.id ?? -1));
+			return scrobble(
+				payload.songs.map(
+					(song) => new ClonedSong(song, sender.tab?.id ?? -1),
+				),
+				payload.currentlyPlaying,
+			);
 		},
 	}),
 
@@ -406,10 +434,11 @@ setupBackgroundListeners(
 	backgroundListener({
 		type: 'toggleLove',
 		fn: (payload, sender) => {
-			return toggleLove(
-				new ClonedSong(payload.song, sender.tab?.id ?? -1),
-				payload.isLoved,
-			);
+			const song = new ClonedSong(payload.song, sender.tab?.id ?? -1);
+			if (payload.shouldShowNotification) {
+				showLovedNotification(song, payload.isLoved);
+			}
+			return toggleLove(song, payload.isLoved);
 		},
 	}),
 
@@ -460,6 +489,41 @@ setupBackgroundListeners(
 				activeTabs: curState.activeTabs,
 				browserPreferredTheme: payload,
 			});
+		},
+	}),
+
+	/**
+	 * Listener called by a content script to fetch through background script.
+	 */
+	backgroundListener({
+		type: 'fetch',
+		fn: async ({ url, init }) => {
+			const res = await fetch(url, init);
+			if (!res.ok) {
+				return {
+					ok: false,
+					content: '',
+				};
+			}
+			return {
+				ok: true,
+				content: await res.text(),
+			};
+		},
+	}),
+
+	/**
+	 * Listener called by a content script to figure out whether it is currently audible
+	 */
+	backgroundListener({
+		type: 'isTabAudible',
+		fn: async (_, sender) => {
+			const tabId = sender.tab?.id;
+			if (typeof tabId !== 'number') {
+				return Promise.resolve(true);
+			}
+
+			return (await browser.tabs.get(tabId)).audible ?? true;
 		},
 	}),
 );

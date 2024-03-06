@@ -5,7 +5,7 @@ import browser from 'webextension-polyfill';
 import { GlobalOptionEntry } from '../inputs';
 import styles from '../components.module.scss';
 import { t } from '@/util/i18n';
-import { capitalizeFirstLetter, debugLog } from '@/util/util';
+import { debugLog, kebabCaseToPascalCase } from '@/util/util';
 import {
 	ModifiedTheme,
 	getTheme,
@@ -65,6 +65,14 @@ export default function GlobalOptionsList(props: {
 					i18nlabel="optionScrobblePodcasts"
 					key={Options.SCROBBLE_PODCASTS}
 				/>
+				<GlobalOptionEntry
+					options={props.options}
+					setOptions={props.setOptions}
+					globalOptions={globalOptions}
+					i18ntitle="optionAutoToggleLoveTitle"
+					i18nlabel="optionAutoToggleLove"
+					key={Options.AUTO_TOGGLE_LOVE}
+				/>
 			</ul>
 		</>
 	);
@@ -105,7 +113,7 @@ function ThemeSelector() {
 						{(themeName) => (
 							<option value={`theme-${themeName}`}>
 								{t(
-									`optionTheme${capitalizeFirstLetter(
+									`optionTheme${kebabCaseToPascalCase(
 										themeName,
 									)}`,
 								)}

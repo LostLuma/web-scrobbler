@@ -10,6 +10,8 @@ import {
 	WebhookModel,
 	Properties,
 	StateManagement,
+	CacheScrobble,
+	BlockedTags,
 	Blocklists,
 } from '@/core/storage/wrapper';
 import { RegexEdit } from './regex';
@@ -139,6 +141,8 @@ export function hideObjectValue(
 		| WebhookModel
 		| StateManagement
 		| RegexEdit[]
+		| CacheScrobble[]
+		| BlockedTags[]
 		| Blocklists,
 ): string {
 	if (!keyValue) {
@@ -230,8 +234,11 @@ export function areAllResults<T>(results: T[], result: T): boolean {
  * @param text - The string to capitalize the first letter of
  * @returns The string with the first letter capitalized
  */
-export function capitalizeFirstLetter(text: string): string {
-	return text[0].toUpperCase() + text.slice(1);
+export function kebabCaseToPascalCase(text: string): string {
+	return text
+		.split('-')
+		.map((s) => s[0].toUpperCase() + s.slice(1))
+		.join('');
 }
 
 /**

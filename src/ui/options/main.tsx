@@ -3,7 +3,7 @@ import styles from './settings.module.scss';
 import { initializeThemes } from '@/theme/themes';
 import '@/theme/themes.scss';
 import { Show, createSignal, onCleanup } from 'solid-js';
-import Close from '@suid/icons-material/CloseOutlined';
+import { CloseOutlined } from '@/ui/components/icons';
 import Sidebar from './sidebar/sidebar';
 import { EditsModal } from './components/edit-options/edited-tracks';
 import Permissions from './components/permissions';
@@ -18,6 +18,8 @@ import {
 	showSomeLoveItem,
 } from './components/navigator';
 import ContextMenu from '../components/context-menu/context-menu';
+import { CacheEditModal } from './components/scrobble-cache';
+import { BlockedTagsModal } from './components/edit-options/blocked-tags';
 import { BlocklistModal } from './components/edit-options/blocked-channels';
 
 /**
@@ -50,10 +52,12 @@ function getDefaultSetting(): NavigatorNavigationButton {
 
 const defaultSetting = getDefaultSetting();
 
-const modalMap = {
+const modals = {
 	savedEdits: EditsModal,
 	regexEdits: RegexEditsModal,
 	blocklist: BlocklistModal,
+	cacheEdit: CacheEditModal,
+	blockedTags: BlockedTagsModal,
 	'': () => <div>Loading...</div>,
 };
 
@@ -119,13 +123,13 @@ function Options() {
 				onClose={() => setActiveModal('')}
 			>
 				<div class={styles.modalContent}>
-					<Dynamic component={modalMap[activeModal()]} />
+					<Dynamic component={modals[activeModal()]} />
 				</div>
 				<button
 					class={styles.modalClose}
 					onClick={() => modal?.close()}
 				>
-					<Close />
+					<CloseOutlined />
 				</button>
 			</dialog>
 		</>

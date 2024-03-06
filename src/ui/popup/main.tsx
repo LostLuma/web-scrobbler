@@ -18,7 +18,7 @@ import Disabled from './disabled';
 import Err from './err';
 import NowPlaying from './nowplaying';
 import Edit from './edit';
-import Settings from '@suid/icons-material/SettingsOutlined';
+import { SettingsOutlined } from '@/ui/components/icons';
 import browser from 'webextension-polyfill';
 import styles from './popup.module.scss';
 import { t } from '@/util/i18n';
@@ -47,9 +47,12 @@ const settingModes = [
 const contextMenuModes = [
 	ControllerMode.Playing,
 	ControllerMode.Skipped,
+	ControllerMode.Paused,
 	ControllerMode.Scrobbled,
 	ControllerMode.Loading,
 	ControllerMode.Unknown,
+	ControllerMode.Loved,
+	ControllerMode.Unloved,
 ];
 
 /**
@@ -90,8 +93,11 @@ function Popup() {
 		[ControllerMode.Disabled]: () => <Disabled />,
 		[ControllerMode.Err]: () => <Err />,
 		[ControllerMode.Playing]: () => <NowPlaying tab={tab} />,
+		[ControllerMode.Paused]: () => <NowPlaying tab={tab} />,
 		[ControllerMode.Skipped]: () => <NowPlaying tab={tab} />,
 		[ControllerMode.Scrobbled]: () => <NowPlaying tab={tab} />,
+		[ControllerMode.Loved]: () => <NowPlaying tab={tab} />,
+		[ControllerMode.Unloved]: () => <NowPlaying tab={tab} />,
 		[ControllerMode.Disallowed]: () => <Disallowed tab={tab} />,
 		[ControllerMode.Unknown]: () => <Edit tab={tab} />,
 		[ControllerMode.Unsupported]: () => <Unsupported />,
@@ -131,7 +137,7 @@ function Popup() {
 					class={styles.settingsIcon}
 					title={t('disabledSiteButton')}
 				>
-					<Settings />
+					<SettingsOutlined />
 				</PopupAnchor>
 			</Show>
 		</>

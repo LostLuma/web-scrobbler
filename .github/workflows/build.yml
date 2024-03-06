@@ -26,7 +26,7 @@ jobs:
           npm run build chrome
 
       - name: Upload the extension as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-scrobbler-chrome
           path: build/chrome
@@ -37,10 +37,6 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
-
-      - name: Get Node.js version from .nvmrc
-        id: get-node-version
-        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -56,7 +52,7 @@ jobs:
           npm run build firefox
 
       - name: Upload the extension as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-scrobbler-firefox
           path: build/firefox
@@ -82,7 +78,7 @@ jobs:
           npm run build safari
 
       - name: Upload the extension as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-scrobbler-safari
           path: build/safari

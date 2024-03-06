@@ -11,13 +11,14 @@
 	}
 
 	.tripleCheckboxWrapper {
+		border: var(--interactable-border);
 		border-radius: $size;
 		display: flex;
 		overflow: hidden;
 
 		.tripleCheckboxLabel {
 			--btn-color: var(--last-fm);
-			--btn-active-color: var(--always-light);
+			--btn-active-color: var(--active-text);
 			--btn-active-background-color: var(--last-fm);
 			align-items: center;
 			background-color: var(--background);
@@ -35,6 +36,11 @@
 				color: var(--btn-active-color);
 			}
 
+			&.unchecked {
+				--btn-color: var(--reject);
+				--btn-active-background-color: var(--reject);
+			}
+
 			&.checked {
 				--btn-color: var(--confirm);
 				--btn-active-background-color: var(--confirm);
@@ -42,8 +48,17 @@
 
 			&.indeterminate {
 				--btn-color: var(--text);
-				--btn-active-background-color: var(--checkbox-inactive);
+				--btn-active-background-color: var(--indeterminate);
 			}
+
+			&:nth-child(2) {
+				border-left: var(--interactable-border);
+				border-right: var(--interactable-border);
+			}
+		}
+
+		&:has(input:focus-visible) {
+			outline: 2px solid var(--text) !important;
 		}
 
 		.tripleCheckbox {
@@ -75,11 +90,12 @@
 }
 
 .button {
+	$icon-color: var(--always-light);
 	align-items: center;
 	background-color: var(--always-last-fm);
-	border: none;
+	border: var(--interactable-border);
 	border-radius: 3px;
-	color: var(--always-light);
+	color: $icon-color;
 	cursor: pointer;
 	display: flex;
 	font-size: 1.2em;
@@ -87,16 +103,27 @@
 	white-space: nowrap;
 	width: min-content;
 
+	.applyFill {
+		fill: $icon-color;
+	}
+
 	svg {
 		margin-right: 0.2em;
 	}
 
 	&:hover {
 		background-color: var(--always-last-fm-hover);
+		color: var(--active-text);
 	}
 
 	span {
 		white-space: nowrap;
+	}
+
+	&:disabled {
+		background-color: var(--last-fm-bg);
+		color: var(--muted-text);
+		cursor: default;
 	}
 
 	&.noRadius {
@@ -139,6 +166,7 @@
 		--entry-color: var(--text);
 		--entry-margin-top: 5px;
 		align-items: center;
+		border: var(--interactable-border);
 		color: var(--entry-color);
 		display: flex;
 		padding: 0.5em 0;
@@ -201,13 +229,72 @@
 
 	select {
 		background-color: var(--background);
-		border: none;
+		border: var(--interactable-border);
 		border-radius: $size;
 		color: var(--text);
 		display: inline-block;
 		font-size: 2 * $size;
 		margin-left: auto;
 		padding: (0.5 * $size) $size;
+	}
+}
+
+.editTable {
+	margin-bottom: 1rem;
+
+	label {
+		padding-right: 1rem;
+	}
+
+	label,
+	input {
+		font-size: 1rem;
+	}
+
+	input {
+		appearance: none;
+		background-color: var(--last-fm-bg-weak);
+		border: none;
+		border-radius: 0.5rem;
+		color: var(--text);
+		padding: 0.25rem 0.5rem;
+		width: 30ch;
+	}
+}
+
+.saveIcon {
+	transform: rotate(0deg);
+
+	&.savingSaveIcon {
+		transform: rotate(360deg);
+		transform-origin: 41% 42.5%;
+		transition: transform 600ms ease-in-out;
+	}
+}
+
+.scrobbleButtonsWrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+summary {
+	border: var(--interactable-border);
+	list-style: none;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+}
+
+.scrobbleCacheList {
+	summary {
+		padding: 0.5rem 0;
+	}
+
+	.summarySpan {
+		font-size: 1.5em;
+		font-weight: bold;
 	}
 }
 
@@ -228,6 +315,7 @@
 
 	.checkboxWrapper {
 		background-color: var(--checkbox-background);
+		border: var(--interactable-border);
 		border-radius: $checkbox-size;
 		display: inline-block;
 		height: $checkbox-size;
@@ -250,7 +338,7 @@
 	}
 
 	input:checked ~ .checkboxWrapper {
-		--checkbox-background: var(--always-last-fm);
+		--checkbox-background: var(--checkbox-active);
 		--checkbox-offset: calc(
 			#{$tick-width} - #{$tick-offset} - #{$tick-size}
 		);
@@ -275,8 +363,15 @@
 	}
 
 	.bigLabel:hover,
-	&.summaryCheckbox .checkboxWrapper:hover {
+	&.summaryCheckbox .checkboxWrapper:hover,
+	.bigLabel input:focus-visible + .checkboxWrapper,
+	.summarySpan input:focus-visible + .checkboxWrapper {
 		filter: brightness(1.1);
+	}
+
+	.bigLabel input:focus-visible + .checkboxWrapper,
+	.summarySpan input:focus-visible + .checkboxWrapper {
+		outline: 2px solid var(--text);
 	}
 }
 
@@ -285,17 +380,9 @@
 	max-width: 50vw;
 }
 
-summary {
-	list-style: none;
-
-	&::-webkit-details-marker {
-		display: none;
-	}
-}
-
 .radioButtons {
-	li {
-		margin-bottom: 1em;
+	.radioButton {
+		margin-bottom: 0.75em;
 	}
 
 	input {
@@ -306,6 +393,7 @@ summary {
 
 	.radioLabel {
 		background-color: var(--background);
+		border: var(--interactable-border);
 		border-radius: 0.5em;
 		color: var(--text);
 		cursor: pointer;
@@ -317,11 +405,16 @@ summary {
 	.radioLabel:hover,
 	input:checked + .radioLabel {
 		background-color: var(--last-fm);
-		color: var(--always-light);
+		color: var(--active-text);
+	}
+
+	input:focus-visible + .radioLabel {
+		outline: 2px solid var(--text);
 	}
 }
 
-.connectorOptionsList {
+.connectorOptionsList,
+.scrobbleCacheList {
 	$animation-duration: 0.2s;
 
 	summary,
@@ -338,6 +431,10 @@ summary {
 
 	summary {
 		cursor: pointer;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
 	}
 
 	.expandVector {
@@ -353,6 +450,7 @@ summary {
 
 .patternWrapper {
 	$size: 0.5em;
+	border: var(--interactable-border);
 	border-radius: $size;
 	display: flex;
 	margin-bottom: $size;
@@ -364,6 +462,11 @@ summary {
 		border: none;
 		color: var(--text);
 		font-size: 1.2em;
+	}
+
+	.button {
+		border: none;
+		border-left: var(--interactable-border);
 	}
 }
 
@@ -377,7 +480,7 @@ summary {
 .propInput {
 	$size: 0.5em;
 	background-color: var(--background);
-	border: none;
+	border: var(--interactable-border);
 	border-radius: $size;
 	color: var(--text);
 	font-size: 1em;
@@ -387,29 +490,19 @@ summary {
 
 .permissionsPopup {
 	background-color: var(--sidebar-bg);
-	color: var(--text);
+	border-bottom: var(--interactable-border);
 	margin: 0;
 	text-align: center;
 
 	button {
 		background: none;
 		border: none;
+		color: var(--text);
 		cursor: pointer;
 		font-size: 1.25em;
 		margin: 0;
 		padding: 1em 15vw;
 	}
-}
-
-.attentionWindow {
-	background-color: var(--sidebar-bg);
-	color: var(--text);
-	font-size: 1.2em;
-	line-height: 1.25;
-	margin: 0 auto;
-	padding: 1em;
-	text-align: center;
-	width: 80%;
 }
 
 .arrayPropWrapper {
@@ -440,14 +533,26 @@ summary {
 		'track tracksearch trackreplace' 2em
 		'artist artistsearch artistreplace' 2em
 		'album albumsearch albumreplace' 2em
-		'albumartist albumartistsearch albumartistreplace' 2em / auto 1fr 1fr;
-	margin: 0.75em 0;
+		'albumartist albumartistsearch albumartistreplace' 2em
+		'flags flags flags' 2em / auto 1fr 1fr;
+	margin-bottom: 1.5em;
+	margin-top: 0.75em;
 	padding: 0.25em 1em;
 	width: 100%;
+
+	.regexEditEntry {
+		border: var(--interactable-border);
+	}
 
 	/**
 	 * Set grid areas
 	 */
+	.regexDeleteFlags {
+		display: flex;
+		gap: 0.5em;
+		grid-area: flags;
+	}
+
 	.regexDeleteSearchLabel {
 		grid-area: search;
 	}
@@ -505,13 +610,137 @@ summary {
 	}
 }
 
-.saveIcon {
-	transform: rotate(0deg);
+.scrobble {
+	align-items: center;
+	background-color: var(--last-fm-bg-weak);
+	border: var(--interactable-border);
+	border-radius: 1em;
+	box-shadow: var(--neuomorphic-small-bottom), var(--neuomorphic-small-top);
+	display: flex;
+	gap: 0.5em;
+	height: 7em;
+	margin-bottom: 1em;
+	overflow: hidden;
+	padding-right: 1em;
 
-	&.savingSaveIcon {
-		transform: rotate(360deg);
-		transform-origin: 41% 42.5%;
-		transition: transform 600ms ease-in-out;
+	.scrobbleCheckbox {
+		border: none;
+	}
+
+	.coverArt {
+		height: 7em;
+		object-fit: cover;
+		width: 7em;
+	}
+
+	.scrobbleDetails {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		flex-shrink: 1;
+		justify-content: space-between;
+		min-height: 6em;
+		overflow: hidden;
+
+		.scrobbleMetadata {
+			display: flex;
+			flex-direction: column;
+
+			span {
+				white-space: nowrap;
+			}
+
+			.trackName {
+				font-size: 1rem;
+				font-weight: bold;
+			}
+
+			.artistName,
+			.albumName,
+			.albumArtistName {
+				font-size: 0.7rem;
+			}
+		}
+
+		.scrobbleActions {
+			display: flex;
+			gap: 0.5rem;
+
+			.scrobbleActionButton {
+				background-color: var(--always-last-fm);
+				border: var(--interactable-border);
+				border-radius: 3px;
+				color: var(--always-light);
+				cursor: pointer;
+
+				&:hover {
+					background-color: var(--always-last-fm-hover);
+					color: var(--active-text);
+				}
+
+				&:disabled {
+					background-color: var(--last-fm-bg);
+					color: var(--text);
+				}
+			}
+		}
+	}
+
+	&:has(:checked) {
+		background-color: var(--always-last-fm);
+		color: var(--active-text);
+
+		.scrobbleDetails .scrobbleActions .scrobbleActionButton {
+			background-color: var(--last-fm-bg-light);
+			color: var(--always-last-fm);
+		}
+	}
+
+	&.selectingScrobble {
+		cursor: pointer;
+
+		&:hover:not(:has(:checked)) {
+			background-color: var(--last-fm-bg);
+			color: var(--text);
+
+			.scrobbleDetails .scrobbleActions .scrobbleActionButton {
+				background-color: var(--always-last-fm);
+				color: var(--active-text);
+			}
+		}
+	}
+
+	@media only screen and (width <= 500px) {
+		.scrobbleDetails .scrobbleMetadata {
+			.trackName {
+				font-size: 0.8rem;
+			}
+
+			.artistName,
+			.albumName,
+			.albumArtistName {
+				font-size: 0.6rem;
+			}
+		}
+
+		.scrobbleDate {
+			font-size: 0.8rem;
+		}
+	}
+
+	@media only screen and (width <= 400px) {
+		border-radius: 0;
+		box-sizing: border-box;
+		margin-left: -1rem;
+		width: 100vw;
+	}
+
+	@media only screen and (width <= 300px) {
+		padding-right: 0.5rem;
+
+		.scrobbleDate {
+			font-size: 0.7rem;
+		}
 	}
 }
 
@@ -532,19 +761,21 @@ summary {
 
 		&::-webkit-slider-runnable-track {
 			background: var(--checkbox-inactive);
+			border: var(--interactable-border);
 			border-radius: 0.5rem;
 			height: 0.5rem;
 		}
 
 		&::-moz-range-track {
 			background: var(--checkbox-inactive);
+			border: var(--interactable-border);
 			border-radius: 0.5rem;
 			height: 0.5rem;
 		}
 
 		&::-moz-range-thumb {
 			background-color: var(--always-last-fm);
-			border: none;
+			border: var(--interactable-border);
 			border-radius: 0.25rem;
 			height: 1.5rem;
 			width: 1rem;
@@ -554,6 +785,7 @@ summary {
 			-webkit-appearance: none;
 			appearance: none;
 			background-color: var(--always-last-fm);
+			border: var(--interactable-border);
 			border-radius: 0.25rem;
 			height: 1.5rem;
 			margin-top: -0.5rem;
@@ -604,7 +836,7 @@ summary {
 			-moz-appearance: textfield;
 			appearance: textfield;
 			background-color: var(--background);
-			border: none;
+			border: var(--interactable-border);
 			border-radius: 0.5em;
 			color: var(--text);
 			font-size: 1.2em;

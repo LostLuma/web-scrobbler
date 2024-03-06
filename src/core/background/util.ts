@@ -167,6 +167,7 @@ async function getTabDetails(tabId: number): Promise<ManagerTab> {
 		const curTab: ManagerTab = {
 			tabId,
 			mode: tabState.mode,
+			permanentMode: tabState.permanentMode,
 			song: tabState.song,
 		};
 		return curTab;
@@ -174,6 +175,7 @@ async function getTabDetails(tabId: number): Promise<ManagerTab> {
 		return {
 			tabId,
 			mode: ControllerMode.Unsupported,
+			permanentMode: ControllerMode.Unsupported,
 			song: null,
 		};
 	}
@@ -284,7 +286,7 @@ export function addToBlocklist(tabId: number) {
 /**
  * Enables scrobbling current channel for a tab
  *
- * @param tabId - tab id of tab to disable scrobbling channel for
+ * @param tabId - tab id of tab to enable scrobbling channel for
  */
 export function removeFromBlocklist(tabId: number) {
 	sendBackgroundMessage(tabId, {

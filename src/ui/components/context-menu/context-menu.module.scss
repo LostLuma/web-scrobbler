@@ -1,17 +1,20 @@
+@use '../util';
+
 .contextMenu {
 	background-color: var(--last-fm-bg);
 	color: var(--text);
 	display: flex;
 
 	.contextMenuItem {
+		border: var(--interactable-border);
 		flex-grow: 1;
 		padding: 0.5em 0;
 		position: relative;
 
-		@supports (-webkit-touch-callout: none) {
+		@supports #{util.$mobile-supports} {
 			&.activeDialogButton {
 				background-color: var(--always-last-fm-hover);
-				color: var(--always-light);
+				color: var(--active-text);
 			}
 		}
 
@@ -34,6 +37,7 @@
 
 .contextMenu,
 .contextMenuDialog {
+	border: var(--interactable-border);
 	z-index: 1000000;
 
 	// stylelint-disable-next-line no-duplicate-selectors
@@ -45,7 +49,6 @@
 
 	.contextMenuItem {
 		background-color: transparent;
-		border: none;
 		color: var(--text);
 		cursor: pointer;
 		display: flex;
@@ -59,10 +62,10 @@
 			margin: 0 auto;
 		}
 
-		@supports not (-webkit-touch-callout: none) {
+		@supports not (#{util.$mobile-supports}) {
 			&:hover {
 				background-color: var(--always-last-fm-hover);
-				color: var(--always-light);
+				color: var(--active-text);
 			}
 		}
 	}
@@ -71,7 +74,6 @@
 .contextMenuDialog {
 	animation: 0s ease-in-out forwards hide;
 	background-color: var(--context-bg);
-	border: none;
 	border-radius: 0.5em;
 	color: var(--text);
 	display: flex;
@@ -111,6 +113,7 @@
 	}
 
 	.contextMenuItem {
+		border: none;
 		padding: 1em;
 
 		&:not(:last-child) {
