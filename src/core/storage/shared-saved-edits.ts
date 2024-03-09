@@ -7,7 +7,7 @@ class SharedSavedEditsImpl {
 
 	public async get(song: BaseSong): Promise<SavedEdit | void> {
 		const uniqueId = song.getUniqueId();
-		const isYoutube = song.connectorLabel.toLowerCase().includes('youtube');
+		const isYoutube = song.connector.label.toLowerCase().includes('youtube');
 
 		if (!uniqueId || !isYoutube) {
 			return;
@@ -30,7 +30,7 @@ class SharedSavedEditsImpl {
 
 	public async put(song: BaseSong, savedEdit: SavedEdit): Promise<boolean> {
 		const uniqueId = song.getUniqueId();
-		const isYoutube = song.connectorLabel.toLowerCase().includes('youtube');
+		const isYoutube = song.connector.label.toLowerCase().includes('youtube');
 
 		if (!uniqueId || !isYoutube) {
 			return false;
