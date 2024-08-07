@@ -13,7 +13,7 @@ import type { DebugLogType } from '@/util/util';
 
 import { t } from '@/util/i18n';
 import * as ControllerMode from '@/core/object/controller/controller-mode';
-import Song from '../object/song';
+import type Song from '../object/song';
 import { sendContentMessage } from '@/util/communication';
 
 const BrowserStorage = (async () => {
@@ -47,6 +47,7 @@ export type Separator =
 	| '~'
 	| ' | '
 	| '<br/>'
+	| '<br>'
 	| ' by '
 	| ', '
 	| '·'
@@ -100,7 +101,7 @@ export function stringToSeconds(str: string | null | undefined): number {
 		.map((current) => parseInt(current, 10))
 		.reduce((total, current, i) => total + current * Math.pow(60, i));
 
-	return seconds && negativeExpression.test(str) ? -seconds : seconds ?? 0;
+	return seconds && negativeExpression.test(str) ? -seconds : (seconds ?? 0);
 }
 
 /**
@@ -961,8 +962,8 @@ export function parseYtVideoDescription(
 	} else {
 		[track, artist, ...featArtists] = trackInfo;
 
-		const areFeatArtistPresent = featArtists.some(
-			(artist) => track?.includes(artist),
+		const areFeatArtistPresent = featArtists.some((artist) =>
+			track?.includes(artist),
 		);
 		if (!areFeatArtistPresent) {
 			const featArtistsStr = featArtists.join(ARTIST_SEPARATOR);
