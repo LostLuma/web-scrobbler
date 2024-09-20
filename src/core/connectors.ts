@@ -287,7 +287,7 @@ export default <ConnectorMeta[]>[
 	},
 	{
 		label: 'Online Radio Box',
-		matches: ['*://onlineradiobox.com/*'],
+		matches: ['*://onlineradiobox.com/*', '*://p.onlineradiobox.com/*'],
 		js: 'onlineradiobox.js',
 		id: 'onlineradiobox',
 	},
@@ -1719,9 +1719,9 @@ export default <ConnectorMeta[]>[
 		id: 'coderadio',
 	},
 	{
-		label: 'Dash Radio',
-		matches: ['*://dashradio.com/*'],
-		js: 'dashradio.js',
+		label: 'LITT Live',
+		matches: ['*://littlive.com/*'],
+		js: 'littlive.js',
 		id: 'dashradio',
 	},
 	{
@@ -2562,5 +2562,17 @@ export default <ConnectorMeta[]>[
 		matches: ['*://mytuner-radio.com/*'],
 		js: 'mytuner.js',
 		id: 'mytuner',
+	},
+	{
+		label: 'Mirlo',
+		matches: ['*://mirlo.space/*'],
+		js: 'mirlo.js',
+		id: 'mirlo',
+	},
+	{
+		label: 'Simulator Radio',
+		matches: ['*://*.simulatorradio.com/*'],
+		js: 'simulatorradio.js',
+		id: 'simulatorradio',
 	},
 ];
