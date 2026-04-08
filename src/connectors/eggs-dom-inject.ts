@@ -12,7 +12,7 @@
 
 // cleanup previous script
 if ('cleanup' in window && typeof window.cleanup === 'function') {
-	window.cleanup();
+	(window as unknown as { cleanup: () => void }).cleanup();
 }
 
 (window as unknown as { cleanup: () => void }).cleanup = (() => {
@@ -138,16 +138,14 @@ if ('cleanup' in window && typeof window.cleanup === 'function') {
 		if (event.origin !== 'https://www.youtube.com') {
 			return;
 		}
-		// eslint-disable-next-line
+
 		const data = JSON.parse(event.data);
-		// eslint-disable-next-line
+
 		switch (data.event) {
 			case 'onStateChange':
-				// eslint-disable-next-line
 				onYoutubeStateChange(data);
 				break;
 			case 'infoDelivery':
-				// eslint-disable-next-line
 				getTimestamps(data);
 				break;
 		}

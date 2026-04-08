@@ -105,7 +105,7 @@ export function stringToSeconds(str: string | null | undefined): number {
 }
 
 /**
- * Find first occurence of possible separator in given string
+ * Find first occurrence of possible separator in given string
  * and return separator's position and size in chars or null.
  * @param str - String containing separator
  * @param separators - Array of separators
@@ -145,6 +145,15 @@ export function joinArtists(artists: Node[]): string | null {
 			return artist.textContent;
 		})
 		.join(ARTIST_SEPARATOR);
+}
+
+/**
+ * Join array of strings into a single string.
+ * @param artists - Array of strings
+ * @returns String joined by separator
+ */
+export function joinArtistStrings(artists: string[]): string {
+	return artists.join(ARTIST_SEPARATOR);
 }
 
 /**
@@ -229,7 +238,7 @@ export function splitTimeInfo(
  * @param str - Any string
  * @param separators - Array of separators
  * @param swap - Swap values
- * @returns Array of strings splitted by separator
+ * @returns Array of strings split by separator
  */
 export function splitString(
 	str: string | null | undefined,
@@ -423,7 +432,7 @@ export function getTextFromSelectors(
  * a first element with the attribute available.
  *
  * @param selectors - Single selector or array of selectors
- * @param attr - Attrubute to get
+ * @param attr - Attribute to get
  * @param defaultValue - Fallback value
  * @returns Text of element, if available, or default value
  */
@@ -676,7 +685,6 @@ export function queryElements(
 	}
 
 	for (const selector of selectors) {
-		// eslint-disable-next-line
 		const elements = document.querySelectorAll(
 			selector,
 		) as NodeListOf<HTMLElement>;
@@ -801,7 +809,7 @@ class DebugLogQueue {
 				}
 			}
 			this.isActive = false;
-		} catch (err) {
+		} catch {
 			this.isActive = false;
 		}
 	}
@@ -1096,22 +1104,22 @@ type BackgroundResponse<T> =
 export function fetchFromServiceWorker(
 	url: string,
 	type: 'text',
-	init?: RequestInit | undefined,
+	init?: RequestInit,
 ): Promise<BackgroundResponse<string>>;
 export function fetchFromServiceWorker(
 	url: string,
 	type: 'json',
-	init?: RequestInit | undefined,
+	init?: RequestInit,
 ): Promise<BackgroundResponse<unknown>>;
 export function fetchFromServiceWorker(
 	url: string,
 	type: 'html',
-	init?: RequestInit | undefined,
+	init?: RequestInit,
 ): Promise<BackgroundResponse<Document>>;
 export async function fetchFromServiceWorker(
 	url: string,
 	type: 'text' | 'json' | 'html',
-	init?: RequestInit | undefined,
+	init?: RequestInit,
 ) {
 	const res = await sendContentMessage({
 		type: 'fetch',

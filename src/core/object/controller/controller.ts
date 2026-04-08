@@ -308,7 +308,7 @@ export default class Controller {
 			}),
 			contentListener({
 				type: 'disableConnectorUntilTabIsClosed',
-				// eslint-disable-next-line
+
 				fn: () => this.disableUntilTabIsClosed(),
 			}),
 			contentListener({
@@ -621,7 +621,7 @@ export default class Controller {
 					shouldShowNotification,
 				},
 			});
-		} catch (err) {
+		} catch {
 			this.currentSong.setLoveStatus(!isLoved, true);
 		}
 
@@ -652,7 +652,7 @@ export default class Controller {
 		 * If there has not been definitive state before,
 		 * just change state without sending anything to service.
 		 * We dont want the extension to randomly unlove songs
-		 * on scrobbling service because user didnt do it on
+		 * on scrobbling service because user didn't do it on
 		 * streaming service.
 		 */
 		if (this.currentSong.flags.isLovedInService === null) {
@@ -757,7 +757,6 @@ export default class Controller {
 	 */
 	private setMode(mode: ControllerModeStr): void {
 		if (!mode) {
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			throw new Error(`Unknown mode: ${mode}`);
 		}
 
